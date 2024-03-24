@@ -1,9 +1,7 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
+    id(libs.plugins.android.application.get().pluginId)
+    id(libs.plugins.kotlin.get().pluginId)
+    id(libs.plugins.compose.get().pluginId)
 }
 
 kotlin {
@@ -33,6 +31,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            implementation(projects.sample)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)

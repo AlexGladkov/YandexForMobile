@@ -1,8 +1,6 @@
 plugins {
-    // this is necessary to avoid the plugins to be loaded multiple times
-    // in each subproject's classloader
-    alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.jetbrainsCompose) apply false
-    alias(libs.plugins.kotlinMultiplatform) apply false
+    id(libs.plugins.kotlin.get().pluginId).apply(false)
+    id(libs.plugins.android.application.get().pluginId).apply(false)
+    id(libs.plugins.compose.get().pluginId).apply(false)
+    id(libs.plugins.libres.get().pluginId).apply(false)
 }

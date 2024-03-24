@@ -1,5 +1,17 @@
 [versions]
-agp = "8.2.0"
+# Plugins
+plugin-android = "8.2.2" # https://developer.android.com/studio/releases/gradle-plugin
+plugin-compose = "1.6.0" # https://github.com/JetBrains/compose-jb
+
+# Multiplatform
+kotlin = "1.9.22"
+coroutines = "1.7.3"
+serialization = "1.5.1"
+libres = "1.2.2"
+
+# Libraries
+kinject = "0.6.3"
+
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -13,9 +25,14 @@ androidx-test-junit = "1.1.5"
 compose = "1.6.2"
 compose-plugin = "1.6.0"
 junit = "4.13.2"
-kotlin = "1.9.22"
 
 [libraries]
+plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
+plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "plugin-compose" }
+plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+plugin-libres = { module = "io.github.skeptick.libres:gradle-plugin", version.ref = "libres" }
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,12 +42,19 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+
+kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kinject" }
+kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kinject" }
+
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 
 [plugins]
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "plugin-android" }
+android-library = { id = "com.android.library", version.ref = "plugin-android" }
+kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "plugin-compose" }
+libres = { id = "io.github.skeptick.libres", version.ref = "libres" }
+cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods" }
