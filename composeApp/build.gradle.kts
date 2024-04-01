@@ -32,8 +32,7 @@ kotlin {
         }
 
         commonMain.dependencies {
-            implementation(projects.sample.api)
-            implementation(projects.sample.impl)
+            implementation(projects.sample)
             implementation(projects.core)
 
             implementation(compose.runtime)

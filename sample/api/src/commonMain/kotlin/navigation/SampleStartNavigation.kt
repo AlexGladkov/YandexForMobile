@@ -1,3 +1,0 @@
-package navigation
-
-data object SampleStartNavigation: NavigationItem

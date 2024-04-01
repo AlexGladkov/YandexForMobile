@@ -5,12 +5,12 @@ plugin-compose = "1.6.0" # https://github.com/JetBrains/compose-jb
 
 # Multiplatform
 kotlin = "1.9.22"
-coroutines = "1.7.3"
-serialization = "1.5.1"
-libres = "1.2.2"
 
 # Libraries
-kinject = "0.6.3"
+libres = "1.2.2"
+kodein = "7.18.0"
+odyssey = "1.3.60"
+kviewmodel = "0.2"
 
 android-compileSdk = "34"
 android-minSdk = "24"
@@ -33,6 +33,17 @@ plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", versi
 plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 plugin-libres = { module = "io.github.skeptick.libres:gradle-plugin", version.ref = "libres" }
 
+kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
+
+kviewmodel-core = { module = "io.github.alexgladkov:kviewmodel", version.ref = "kviewmodel" }
+kviewmodel-compose = { module = "io.github.alexgladkov:kviewmodel-compose", version.ref = "kviewmodel" }
+kviewmodel-odyssey = { module = "io.github.alexgladkov:kviewmodel-odyssey", version.ref = "kviewmodel" }
+
+libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
+
+odyssey-core = { module = "io.github.alexgladkov:odyssey-core", version.ref = "odyssey"}
+odyssey-compose = { module = "io.github.alexgladkov:odyssey-compose", version.ref = "odyssey"}
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -42,9 +53,6 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
-
-kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kinject" }
-kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kinject" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
