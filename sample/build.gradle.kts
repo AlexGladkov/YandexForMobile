@@ -1,5 +1,12 @@
 plugins {
     id("multiplatform-setup")
+    id(libs.plugins.libres.get().pluginId)
+}
+
+libres {
+    generatedClassName = "SampleRes"
+    generateNamedArguments = true
+    baseLocaleLanguageCode = "en"
 }
 
 kotlin {
@@ -16,5 +23,5 @@ kotlin {
 }
 
 android {
-    namespace = "dev.yandex.sample.impl"
+    namespace = "dev.yandex.sample"
 }
