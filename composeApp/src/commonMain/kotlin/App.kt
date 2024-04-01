@@ -13,19 +13,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import navigation.SampleNavigation
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import ru.alexgladkov.odyssey.compose.extensions.present
+import ru.alexgladkov.odyssey.compose.extensions.push
+import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        Column {
-            listOf("Team A", "Team B").forEach {
-                WorldItemView(title = it) {
+    val rootController = LocalRootController.current
 
-                }
+    Column {
+        listOf("Team A", "Team B").forEach {
+            WorldItemView(title = it) {
+                rootController.present(SampleNavigation.sampleFlow, params = it)
             }
         }
     }

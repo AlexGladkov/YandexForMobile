@@ -35,6 +35,11 @@ kotlin {
             implementation(projects.sample)
             implementation(projects.core)
 
+            implementation(libs.odyssey.compose)
+            implementation(libs.odyssey.core)
+
+            implementation(libs.kviewmodel.odyssey)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)

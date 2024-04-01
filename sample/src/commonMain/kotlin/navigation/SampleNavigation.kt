@@ -9,7 +9,7 @@ import sample.SampleScreen
 fun RootComposeBuilder.sampleFlow() {
     flow(name = SampleNavigation.sampleFlow) {
         screen(name = SampleNavigation.sampleScreen) {
-            SampleScreen()
+            SampleScreen(it as String)
         }
         
         screen(name = SampleNavigation.sampleDetailScreen) {
@@ -20,7 +20,7 @@ fun RootComposeBuilder.sampleFlow() {
 
 object SampleNavigation {
     const val sampleFlow = "SampleFlow"
-    const val sampleScreen = "SampleScreen"
-    const val sampleDetailScreen = "SampleDetailScreen"
+    internal const val sampleScreen = "SampleScreen"
+    internal const val sampleDetailScreen = "SampleDetailScreen"
 }
 

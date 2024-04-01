@@ -1,4 +1,6 @@
 package sample.models
 
-sealed class SampleAction
+sealed class SampleAction {
+    data object ShowDetails : SampleAction()
+}
 
