@@ -1,3 +1,0 @@
-package navigation
-
-interface NavigationItem

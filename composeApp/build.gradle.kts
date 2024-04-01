@@ -39,6 +39,7 @@ kotlin {
             implementation(libs.odyssey.core)
 
             implementation(libs.kviewmodel.odyssey)
+            implementation(libs.kodein)
 
             implementation(compose.runtime)
             implementation(compose.foundation)

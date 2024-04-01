@@ -1,6 +1,7 @@
 package tech.mobiledeveloper.worlds
 
 import App
+import PlatformConfiguration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
+import di.PlatformSDK
 import io.github.alexgladkov.kviewmodel.odyssey.setupWithViewModels
 import navigation.MainNavigation
 import navigation.navigationGraph
@@ -25,6 +27,8 @@ class MainActivity : ComponentActivity() {
         val rootController = RootComposeBuilder().apply { navigationGraph() }.build()
         rootController.setupWithActivity(this)
         rootController.setupWithViewModels()
+
+        PlatformSDK.init(PlatformConfiguration(applicationContext))
 
         setContent {
             val backgroundColor = MaterialTheme.colors.background

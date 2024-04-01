@@ -2,6 +2,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.ComposeUIViewController
+import di.PlatformSDK
 import io.github.alexgladkov.kviewmodel.odyssey.setupWithViewModels
 import navigation.MainNavigation
 import navigation.navigationGraph
@@ -16,6 +17,8 @@ fun MainViewController() = ComposeUIViewController {
     val rootController = remember { RootComposeBuilder().apply { navigationGraph() }.build() }
     rootController.setupWithViewModels()
 
+    PlatformSDK.init(PlatformConfiguration())
+    
     val backgroundColor = MaterialTheme.colors.background
     rootController.backgroundColor = backgroundColor
 
