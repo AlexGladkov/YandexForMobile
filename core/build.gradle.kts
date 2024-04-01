@@ -7,5 +7,5 @@ kotlin {
 }
 
 android {
-    namespace = "tech.mobiledeveloper.worlds.sample"
+    namespace = "dev.yandex.core"
 }

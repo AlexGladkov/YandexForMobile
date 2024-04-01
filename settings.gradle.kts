@@ -22,4 +22,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp", "sample")
+include(":composeApp", "sample:impl", "sample:api", "core")

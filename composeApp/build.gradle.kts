@@ -30,8 +30,12 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
         }
+
         commonMain.dependencies {
-            implementation(projects.sample)
+            implementation(projects.sample.api)
+            implementation(projects.sample.impl)
+            implementation(projects.core)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
