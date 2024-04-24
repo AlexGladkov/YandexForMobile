@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
 import di.PlatformSDK
+import io.flutter.embedding.android.FlutterActivity
 import io.github.alexgladkov.kviewmodel.odyssey.setupWithViewModels
 import navigation.MainNavigation
 import navigation.navigationGraph
@@ -28,7 +29,14 @@ class MainActivity : ComponentActivity() {
         rootController.setupWithActivity(this)
         rootController.setupWithViewModels()
 
-        PlatformSDK.init(PlatformConfiguration(applicationContext))
+        PlatformSDK.init(PlatformConfiguration(applicationContext) {
+            startActivity(
+                FlutterActivity.CachedEngineIntentBuilder(
+                    FlutterModuleActivity::class.java,
+                    "flutter_engine"
+                ).build(this)
+            )
+        })
 
         setContent {
             val backgroundColor = MaterialTheme.colors.background
