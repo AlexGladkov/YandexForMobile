@@ -82,6 +82,8 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
+        debugImplementation("ru.alexgladkov.odyssey.yandex_pro_landing:flutter_debug:1.0")
+        releaseImplementation("ru.alexgladkov.odyssey.yandex_pro_landing:flutter_release:1.0")
     }
 }
 
