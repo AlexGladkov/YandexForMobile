@@ -20,7 +20,7 @@ dependencyResolutionManagement {
         mavenLocal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven(url = "https://storage.googleapis.com/download.flutter.io")
-        maven(url = "modules/yandex_pro_landing/build/host/outputs/repo")
+        maven(url = "yandexPro/build/host/outputs/repo")
     }
 }
 

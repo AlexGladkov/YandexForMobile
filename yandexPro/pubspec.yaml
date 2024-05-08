@@ -1,5 +1,5 @@
-name: yandex_pro_landing
-description: "Yandex Pro landing"
+name: yandex_pro
+description: "Yandex Pro Module"
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -83,5 +83,5 @@ flutter:
   # identifiers, which may be completely independent or the same as these.
   module:
     androidX: true
-    androidPackage: ru.alexgladkov.odyssey.yandex_pro_landing
-    iosBundleIdentifier: ru.alexgladkov.odyssey.yandexProLanding
+    androidPackage: ru.alexgladkov.odyssey.yandex_pro
+    iosBundleIdentifier: ru.alexgladkov.odyssey.yandexPro

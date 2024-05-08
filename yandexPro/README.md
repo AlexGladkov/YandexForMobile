@@ -1,4 +1,4 @@
-# yandex_pro_landing
+# yandex_pro
 
 Yandex Pro landing
 
