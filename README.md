@@ -12,3 +12,9 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
 
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+# Local setup
+
+1. [Install Flutter SDK](https://docs.flutter.dev/get-started/install)
+2. Run `cd yandexPro && flutter pub get && flutter build aar && cd ..` — it builds flutter module aar
+3. Now you can run project on your device
