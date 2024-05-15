@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import di.Inject
 import models.Module
 import models.ModuleTech
+import browser.BrowserNavigation
 import navigation.SampleNavigation
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -45,6 +46,9 @@ fun App() {
                     }
                 }
             }
+        }
+        WorldItemView("Browser") {
+            rootController.present(BrowserNavigation.BROWSER_FLOW)
         }
     }
 }
