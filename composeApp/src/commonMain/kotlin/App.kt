@@ -28,7 +28,10 @@ fun App() {
     val rootController = LocalRootController.current
 
     Column {
-        listOf(Module("Team A"), Module("Яндекс Про", ModuleTech.FLUTTER)).forEach {
+        listOf(
+            Module("team_a", "Team A"),
+            Module("pro", "Яндекс Про", ModuleTech.FLUTTER)
+        ).forEach {
             WorldItemView(title = it.name) {
                 when (it.tech) {
                     ModuleTech.KMP -> {
@@ -38,7 +41,7 @@ fun App() {
                     ModuleTech.FLUTTER -> {
                         println("Open Flutter for ${it.name}")
                         val platformConfiguration = Inject.di.instance<PlatformConfiguration>()
-                        platformConfiguration.openFlutterModule("")
+                        platformConfiguration.openFlutterModule(it.key)
                     }
                 }
             }
@@ -48,8 +51,14 @@ fun App() {
 
 @Composable
 private fun ColumnScope.WorldItemView(title: String, onItemClicked: () -> Unit) {
-    Row(modifier = Modifier.clickable(interactionSource = MutableInteractionSource(), indication = null, onClick = onItemClicked).fillMaxWidth().height(72.dp).padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.clickable(
+            interactionSource = MutableInteractionSource(),
+            indication = null,
+            onClick = onItemClicked
+        ).fillMaxWidth().height(72.dp).padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(text = title, fontSize = 24.sp, fontWeight = FontWeight.Medium)
         Spacer(modifier = Modifier.weight(1f))
         Icon(Icons.AutoMirrored.Default.ArrowForward, contentDescription = "Arrow")

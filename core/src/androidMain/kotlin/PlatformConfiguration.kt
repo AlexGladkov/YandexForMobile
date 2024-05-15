@@ -1,8 +1,7 @@
 import android.content.Context
-import android.content.Intent
 
 actual class PlatformConfiguration(
-    val applicationContext: Context, val openFlutterPro: () -> Unit
+    val openFlutterModuleCallback: (key: String) -> Unit
 ) {
-    actual fun openFlutterModule(key: String) = openFlutterPro()
+    actual fun openFlutterModule(key: String) = openFlutterModuleCallback(key)
 }

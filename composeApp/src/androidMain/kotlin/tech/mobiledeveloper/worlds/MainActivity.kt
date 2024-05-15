@@ -32,8 +32,7 @@ class MainActivity : ComponentActivity() {
         rootController.setupWithActivity(this)
         rootController.setupWithViewModels()
         warmUpEngine()
-        PlatformSDK.init(PlatformConfiguration(applicationContext) {
-
+        PlatformSDK.init(PlatformConfiguration {
             startActivity(
                 FlutterActivity.CachedEngineIntentBuilder(
                     FlutterModuleActivity::class.java,
