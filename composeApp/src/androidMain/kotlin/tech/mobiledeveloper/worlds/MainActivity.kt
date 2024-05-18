@@ -5,6 +5,7 @@ import PlatformConfiguration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +32,10 @@ class MainActivity : ComponentActivity() {
         val rootController = RootComposeBuilder().apply { navigationGraph() }.build()
         rootController.setupWithActivity(this)
         rootController.setupWithViewModels()
+
+        enableEdgeToEdge()
         warmUpEngine()
+
         PlatformSDK.init(PlatformConfiguration {
             startActivity(
                 FlutterActivity.CachedEngineIntentBuilder(
