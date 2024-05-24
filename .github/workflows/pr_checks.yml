@@ -1,0 +1,41 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  gradleFlags: --parallel --stacktrace --no-configuration-cache --no-daemon
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/init-gradle
+      - name: Run Checks
+        run: ./gradlew check $gradleFlags
+      - name: Upload check reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: check-reports
+          path: |
+            **/build/reports/*    
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/init-gradle
+      - name: Build with Gradle
+        run: ./gradlew :composeApp:assembleDebug $gradleFlags
+      - name: Upload apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
