@@ -3,6 +3,9 @@ name: PR Checks
 on:
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - '**.sh'
 
 env:
   gradleFlags: --parallel --stacktrace --no-configuration-cache --no-daemon
