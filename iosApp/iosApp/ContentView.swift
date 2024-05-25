@@ -4,11 +4,14 @@ import ComposeApp
 import Flutter
 
 struct ComposeView: UIViewControllerRepresentable {
+    var flutterDependencies: FlutterDependencies
+
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController()
+        MainViewControllerKt.MainViewController(callback: showFlutter)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+<<<<<<< HEAD
 }
 
 struct ContentView: View {
@@ -20,6 +23,9 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
     }
 
+=======
+    
+>>>>>>> 13f0b3b (Feature: integrete ios Flutter module in app)
     func showFlutter() {
         guard
             let windowScene = UIApplication.shared.connectedScenes
@@ -38,4 +44,14 @@ struct ContentView: View {
 
         rootViewController.present(flutterViewController, animated: true)
     }
+}
+
+
+struct ContentView: View {
+    @EnvironmentObject var flutterDependencies: FlutterDependencies
+    
+    var body: some View {
+        ComposeView(flutterDependencies: flutterDependencies).ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+    }
+    
 }
