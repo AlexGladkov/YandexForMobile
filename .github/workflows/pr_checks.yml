@@ -21,10 +21,6 @@ jobs:
         uses: ./.github/actions/init-gradle
       - name: Setup Flutter
         uses: ./.github/actions/init-flutter
-      - name: Build Flutter Release Module
-        uses: ./.github/actions/build-flutter-android
-        with:
-          params: --no-debug --no-profile
       - name: Build Flutter Module
         uses: ./.github/actions/build-flutter-android
       - name: Run Checks
@@ -37,23 +33,23 @@ jobs:
             **/build/reports/*  
             
 
-#  build-android:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#      - name: Setup environment
-#        uses: ./.github/actions/init-gradle
-#      - name: Setup Flutter
-#        uses: ./.github/actions/init-flutter
-#      - name: Build Flutter Module
-#        uses: ./.github/actions/build-flutter-android
-#        with:
-#          params: --no-debug --no-profile
-#      - name: Build with Gradle
-#        run: ./gradlew :composeApp:assembleRelease $gradleFlags
-#      - name: Upload apk
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-release.apk
-#          path: composeApp/build/outputs/apk/release/composeApp-release.apk
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup environment
+        uses: ./.github/actions/init-gradle
+      - name: Setup Flutter
+        uses: ./.github/actions/init-flutter
+      - name: Build Flutter Module
+        uses: ./.github/actions/build-flutter-android
+        with:
+          params: --no-debug --no-profile
+      - name: Build with Gradle
+        run: ./gradlew :composeApp:assembleRelease $gradleFlags
+      - name: Upload apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: composeApp/build/outputs/apk/release/composeApp-release.apk
