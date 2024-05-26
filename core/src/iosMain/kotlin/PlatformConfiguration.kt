@@ -1,5 +1,5 @@
-actual class PlatformConfiguration {
-    actual fun openFlutterModule(key: String) {
-        // TODO
-    }
+actual class PlatformConfiguration(
+    val openFlutterPro: () -> Unit
+) {
+    actual fun openFlutterModule(key: String) = openFlutterPro()
 }
