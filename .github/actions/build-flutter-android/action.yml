@@ -8,5 +8,6 @@ runs:
       shell: bash
       run: |
         pushd yandexPro
-        flutter pub get && flutter build aar
+        flutter pub get
+        flutter build aar --no-debug --no-profile
         popd

@@ -45,9 +45,9 @@ jobs:
       - name: Build Flutter Module
         uses: ./.github/actions/build-flutter-android
       - name: Build with Gradle
-        run: ./gradlew :composeApp:assembleDebug $gradleFlags
+        run: ./gradlew :composeApp:assembleRelease $gradleFlags
       - name: Upload apk
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug.apk
-          path: composeApp/build/outputs/apk/debug/composeApp-debug.apk
+          name: app-release.apk
+          path: composeApp/build/outputs/apk/release/composeApp-release.apk
