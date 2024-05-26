@@ -1,5 +1,9 @@
 name: Build Flutter Android
 description: Build Flutter Android
+inputs:
+  params:
+    description: 'Build aar params'
+    required: false
 
 runs:
   using: 'composite'
@@ -9,5 +13,5 @@ runs:
       run: |
         pushd yandexPro
         flutter pub get
-        flutter build aar --no-debug --no-profile
+        flutter build aar ${{ inputs.params }}
         popd

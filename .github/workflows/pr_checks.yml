@@ -44,6 +44,8 @@ jobs:
         uses: ./.github/actions/init-flutter
       - name: Build Flutter Module
         uses: ./.github/actions/build-flutter-android
+        with:
+          params: --no-debug --no-profile
       - name: Build with Gradle
         run: ./gradlew :composeApp:assembleRelease $gradleFlags
       - name: Upload apk
