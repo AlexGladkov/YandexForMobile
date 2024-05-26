@@ -1,0 +1,12 @@
+name: Build Flutter Android
+description: Build Flutter Android
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build Flutter
+      shell: bash
+      run: |
+        pushd yandexPro
+        flutter pub get && flutter build aar
+        popd
