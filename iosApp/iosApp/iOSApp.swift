@@ -1,6 +1,7 @@
 import SwiftUI
 import Flutter
 import FlutterPluginRegistrant
+import YandexMapsMobile
 
 
 class FlutterDependencies: ObservableObject {
@@ -14,12 +15,25 @@ class FlutterDependencies: ObservableObject {
  }
 }
 
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        YMKMapKit.setApiKey("79d2937d-a59b-4cd0-8bda-8346ceb374a2")
+        YMKMapKit.sharedInstance().onStart()
+        return true
+    }
+}
+
+
 @main
 struct iOSApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @StateObject var flutterDependencies = FlutterDependencies()
 	var body: some Scene {
-		WindowGroup {
+        WindowGroup {
             ContentView().environmentObject(flutterDependencies)
-		}
+        }
 	}
+    
+    
 }
