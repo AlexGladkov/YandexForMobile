@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
+import com.yandex.mapkit.MapKitFactory
 import di.PlatformSDK
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -30,6 +31,7 @@ import tech.mobiledeveloper.worlds.browser.BrowserStoriesLauncher
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapKitFactory.initialize(this)
         val rootController = RootComposeBuilder().apply { navigationGraph() }.build()
         rootController.setupWithActivity(this)
         rootController.setupWithViewModels()
@@ -80,6 +82,16 @@ class MainActivity : ComponentActivity() {
         FlutterEngineCache
             .getInstance()
             .put("flutter_engine", flutterEngine)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MapKitFactory.getInstance().onStop()
     }
 }
 
