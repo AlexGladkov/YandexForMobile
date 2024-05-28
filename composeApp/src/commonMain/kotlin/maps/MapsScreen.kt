@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,10 +22,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,42 +43,84 @@ private val items = mapsItems()
 
 @Composable
 fun MapsScreen() {
-    Map()
-//    Box(modifier = Modifier.background(Color(0x88EEEEEE))) {
-//        Image(
-//            painter = painterResource(Res.drawable.browser_background),
-//            modifier = Modifier.fillMaxSize(),
-//            contentDescription = "Background Image",
-//            contentScale = ContentScale.Crop
-//        )
-//        Column(modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.systemBars)) {
-//            Text(text = "Яндекс Карты", fontSize = 28.sp, fontWeight = FontWeight.Medium)
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(
-//                text = "Яндекс Карты – одно из крупнейших приложений Яндекса, " +
-//                        "гео-суперапп, позволяющий пользователям использовать сценарии навигации " +
-//                        "на различных видах транспорта, искать места(организации, достопримечательности). ",
-//                fontSize = 18.sp,
-//                fontWeight = FontWeight.Medium
-//            )
-//
-//            Spacer(modifier = Modifier.height(20.dp))
-//
-//            LazyVerticalStaggeredGrid(
-//                columns = StaggeredGridCells.Fixed(2),
-//                verticalItemSpacing = 16.dp,
-//                horizontalArrangement = Arrangement.spacedBy(16.dp),
-//                content = {
-//
-//                    items(items.size) { index ->
-//                        AppItem(items[index])
-//                    }
-//                },
-//                modifier = Modifier.fillMaxSize()
-//            )
-//        }
-//    }
+
+    MapLayout()
+
+//    DefaultLayout()
 }
+
+@Composable
+private fun MapLayout() {
+
+    val mapState by remember { mutableStateOf(MapState()) }
+
+    Box {
+
+        Map(mapState) {
+            println("wtf camera move $it")
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight()
+//                .pointerInput(Unit) {
+//                    awaitPointerEventScope {
+//                        while (true) {
+//                            val event = awaitPointerEvent()
+//                            // handle pointer event
+//                            val position = event.changes.first().position
+//                            val world = mapState.screenToWorld(ScreenPoint(position.x, position.y))
+//                            println("wtf $world")
+//                        }
+//                    }
+//                }
+        ) {
+
+        }
+
+    }
+}
+
+@Composable
+private fun DefaultLayout() {
+    Box(
+        modifier = Modifier
+            .background(Color(0x88EEEEEE))
+
+    ) {
+        Image(
+            painter = painterResource(Res.drawable.browser_background),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = "Background Image",
+            contentScale = ContentScale.Crop
+        )
+        Column(modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.systemBars)) {
+            Text(text = "Яндекс Карты", fontSize = 28.sp, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Яндекс Карты – одно из крупнейших приложений Яндекса, " +
+                        "гео-суперапп, позволяющий пользователям использовать сценарии навигации " +
+                        "на различных видах транспорта, искать места(организации, достопримечательности). ",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2),
+                verticalItemSpacing = 16.dp,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                content = {
+
+                    items(items.size) { index ->
+                        AppItem(items[index])
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun AppItem(item: MapsItem) {
