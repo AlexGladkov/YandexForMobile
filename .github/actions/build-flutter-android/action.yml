@@ -1,0 +1,17 @@
+name: Build Flutter Android
+description: Build Flutter Android
+inputs:
+  params:
+    description: 'Build aar params'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build Flutter
+      shell: bash
+      run: |
+        pushd yandexPro
+        flutter pub get
+        flutter build aar ${{ inputs.params }}
+        popd

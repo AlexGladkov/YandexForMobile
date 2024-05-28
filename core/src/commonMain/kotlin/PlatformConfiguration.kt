@@ -1,1 +1,3 @@
-expect class PlatformConfiguration
+expect class PlatformConfiguration {
+    fun openFlutterModule(key: String)
+}

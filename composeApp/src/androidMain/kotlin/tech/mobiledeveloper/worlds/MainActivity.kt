@@ -11,6 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
 import di.PlatformSDK
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor
 import io.github.alexgladkov.kviewmodel.odyssey.setupWithViewModels
 import navigation.MainNavigation
 import navigation.navigationGraph
@@ -30,8 +34,16 @@ class MainActivity : ComponentActivity() {
         rootController.setupWithViewModels()
 
         enableEdgeToEdge()
+        warmUpEngine()
 
-        PlatformSDK.init(PlatformConfiguration(applicationContext))
+        PlatformSDK.init(PlatformConfiguration {
+            startActivity(
+                FlutterActivity.CachedEngineIntentBuilder(
+                    FlutterModuleActivity::class.java,
+                    "flutter_engine"
+                ).build(this)
+            )
+        })
 
         setContent {
             val backgroundColor = MaterialTheme.colors.background
@@ -40,11 +52,31 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalRootController provides rootController
             ) {
-                ModalNavigator(configuration = DefaultModalConfiguration(backgroundColor, DisplayType.EdgeToEdge)) {
+                ModalNavigator(
+                    configuration = DefaultModalConfiguration(
+                        backgroundColor,
+                        DisplayType.EdgeToEdge
+                    )
+                ) {
                     Navigator(startScreen = MainNavigation.startScreen)
                 }
             }
         }
+    }
+
+    private fun warmUpEngine() {
+        // Instantiate a FlutterEngine.
+        val flutterEngine = FlutterEngine(this)
+
+        // Start executing Dart code to pre-warm the FlutterEngine.
+        flutterEngine.dartExecutor.executeDartEntrypoint(
+            DartExecutor.DartEntrypoint.createDefault()
+        )
+
+        // Cache the FlutterEngine to be used by FlutterActivity.
+        FlutterEngineCache
+            .getInstance()
+            .put("flutter_engine", flutterEngine)
     }
 }
 

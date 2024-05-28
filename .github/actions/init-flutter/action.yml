@@ -1,0 +1,8 @@
+name: Setup Flutter Environment
+description: Setup Flutter environment
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
