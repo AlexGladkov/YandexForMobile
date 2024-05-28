@@ -5,10 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.yandex.mapkit.geometry.Geo
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.MapObjectCollection
@@ -17,9 +16,10 @@ import com.yandex.runtime.image.ImageProvider
 import maps.data.Australia
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.painterResource
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.map_dot
+import kotlin.math.PI
+import com.yandex.mapkit.map.CameraPosition as MapkitCameraPosition
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -30,34 +30,82 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
     var collection by remember { mutableStateOf<MapObjectCollection?>(null) }
     AndroidView(
         factory = { context ->
+            val initialCenter = Point(
+                Australia.center.lat,
+                Australia.center.lon,
+            )
+            val relatives = Australia.coordinates
+                .map {
+                    val point = Point(it.lat, it.lon)
+                    val course = (Geo.course(initialCenter, point) / 180.0) * PI
+                    val distance = Geo.distance(initialCenter, point)
+
+                    val solved =
+                        DirectProblemSolver.solveDirectProblem(Australia.center, course, distance)
+
+                    println("wtf point=$it, solved=$solved, dlat=${it.lat - solved.lat}, dlon=${it.lon - solved.lon}, course=$course, distance=$distance")
+
+                    RelativePosition(course, distance)
+                }
             MapView(context).also { mapView ->
                 if (onCameraMoved != null) {
-                    val listener = CameraListener { _, position, _, finished ->
-                        onCameraMoved(
-                            CameraMove(
-                                center = Position(
-                                    lat = position.target.latitude,
-                                    lon = position.target.longitude,
-                                ),
-                                finished = finished,
-                            )
-                        )
-                    }
-
-                    savedCameraListener = listener
-                    mapView.mapWindow.map.addCameraListener(listener)
                     state.map = GeoMap(mapView)
 
-                    val placemarks = mapView.mapWindow.map.mapObjects.addCollection().also {
-                        collection = it
-                    }
+                    val placemarksCollection =
+                        mapView.mapWindow.map.mapObjects.addCollection().also {
+                            collection = it
+                        }
 
-                    for (position in Australia.positions) {
-                        placemarks.addPlacemark().apply {
+                    val placemarks = Australia.coordinates.map { position ->
+                        placemarksCollection.addPlacemark().apply {
                             geometry = Point(position.lat, position.lon)
                             setIcon(imageProvider)
                         }
                     }
+
+                    val listener = CameraListener { _, position, _, finished ->
+                        onCameraMoved(
+                            CameraMove(
+                                position = CameraPosition(
+                                    center = Coordinates(
+                                        lat = position.target.latitude,
+                                        lon = position.target.longitude,
+                                    ),
+                                    zoom = position.zoom,
+                                    azimuth = position.azimuth,
+                                ),
+                                finished = finished,
+                            )
+                        )
+
+                        val newCenter = position.target.run {
+                            Coordinates(lat = latitude, lon = longitude)
+                        }
+
+                        relatives.forEachIndexed { index, relativePosition ->
+                            val newCoordinate = DirectProblemSolver.solveDirectProblem(
+                                newCenter,
+                                relativePosition.course,
+                                relativePosition.distance,
+                            )
+                            placemarks[index].geometry = Point(
+                                newCoordinate.lat,
+                                newCoordinate.lon,
+                            )
+                        }
+                    }
+
+                    savedCameraListener = listener
+                    mapView.mapWindow.map.addCameraListener(listener)
+
+                    mapView.mapWindow.map.move(
+                        MapkitCameraPosition(
+                            initialCenter,
+                            Australia.zoom,
+                            0f,
+                            0f,
+                        )
+                    )
                 }
             }
         },

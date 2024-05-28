@@ -8,12 +8,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-interface Action
 
-class Store<TState>(initialState: TState, reduce: (TState, Action) -> TState) {
+class Store<TState>(initialState: TState, reduce: (TState, MapsEvent) -> TState) {
     private val statesSubj = MutableStateFlow(initialState)
 
-    private val actionsSubj = MutableSharedFlow<Action>()
+    private val actionsSubj = MutableSharedFlow<MapsEvent>()
 
     private val scope = MainScope()
 
@@ -26,13 +25,13 @@ class Store<TState>(initialState: TState, reduce: (TState, Action) -> TState) {
 
     fun states(): Flow<TState> = statesSubj
 
-    fun dispatchAsync(action: Action) {
+    fun dispatchAsync(action: MapsEvent) {
         scope.launch {
             dispatch(action)
         }
     }
 
-    suspend fun dispatch(action: Action) {
+    suspend fun dispatch(action: MapsEvent) {
         actionsSubj.emit(action)
     }
 

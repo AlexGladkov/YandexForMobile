@@ -4,7 +4,7 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.ScreenPoint as MapkitScreenPoint
 
 actual class GeoMap(private val mapView: MapView) {
-    actual fun screenToWorld(screenPoint: ScreenPoint): Position? {
+    actual fun screenToWorld(screenPoint: ScreenPoint): Coordinates? {
         val point = mapView.mapWindow.screenToWorld(
             MapkitScreenPoint(
                 screenPoint.x,
@@ -13,7 +13,7 @@ actual class GeoMap(private val mapView: MapView) {
         )
 
         return point?.run {
-            Position(
+            Coordinates(
                 lat = latitude,
                 lon = longitude,
             )

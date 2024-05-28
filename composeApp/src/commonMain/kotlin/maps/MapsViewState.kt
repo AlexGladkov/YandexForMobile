@@ -1,0 +1,4 @@
+package maps
+
+class MapsViewState {
+}

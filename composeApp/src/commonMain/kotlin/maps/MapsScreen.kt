@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import worlds.composeapp.generated.resources.Res
@@ -51,13 +52,14 @@ fun MapsScreen() {
 
 @Composable
 private fun MapLayout() {
-
     val mapState by remember { mutableStateOf(MapState()) }
 
     Box {
 
         Map(mapState) {
-            println("wtf camera move $it")
+            if (it.finished) {
+                println("wtf camera move $it")
+            }
         }
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight()

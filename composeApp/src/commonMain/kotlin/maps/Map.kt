@@ -7,21 +7,30 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
-data class Position(val lat: Double, val lon: Double)
+data class Coordinates(val lat: Double, val lon: Double)
 
-data class CameraMove(val center: Position, val finished: Boolean)
+data class CameraPosition(
+    val center: Coordinates,
+    val zoom: Float,
+    val azimuth: Float,
+)
 
-class MapState(val position: Position? = null) {
+data class CameraMove(
+    val position: CameraPosition,
+    val finished: Boolean
+)
+
+class MapState(val coordinates: Coordinates? = null) {
     var map by mutableStateOf<GeoMap?>(null)
 
     companion object {
-        val Saver: Saver<MapState, Position> = Saver(
-            save = { it.position },
+        val Saver: Saver<MapState, Coordinates> = Saver(
+            save = { it.coordinates },
             restore = { MapState(it) },
         )
     }
 
-    fun screenToWorld(screenPoint: ScreenPoint): Position? {
+    fun screenToWorld(screenPoint: ScreenPoint): Coordinates? {
         return map?.screenToWorld(screenPoint)
     }
 }
