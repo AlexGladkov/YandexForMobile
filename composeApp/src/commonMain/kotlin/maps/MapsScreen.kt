@@ -29,12 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import worlds.composeapp.generated.resources.Res
@@ -43,7 +41,7 @@ import worlds.composeapp.generated.resources.browser_background
 private val items = mapsItems()
 
 @Composable
-fun MapsScreen() {
+fun MapsScreenView() {
 
     MapLayout()
 

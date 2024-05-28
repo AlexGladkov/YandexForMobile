@@ -7,7 +7,7 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 fun RootComposeBuilder.mapsFlow() {
     flow(name = MapsNavigation.FLOW) {
         screen(name = MapsNavigation.SCREEN) {
-            MapsScreen()
+            MapsScreenView()
         }
     }
 }

@@ -21,5 +21,3 @@ class MapsViewModel : BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(Map
 
     }
 }
-
-private fun reduce(state: MapsState, event: MapsEvent): MapsState = state

@@ -34,19 +34,8 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
                 Australia.center.lat,
                 Australia.center.lon,
             )
-            val relatives = Australia.coordinates
-                .map {
-                    val point = Point(it.lat, it.lon)
-                    val course = (Geo.course(initialCenter, point) / 180.0) * PI
-                    val distance = Geo.distance(initialCenter, point)
+            val relatives = calculateRelativeContour(Australia.center, Australia.coordinates)
 
-                    val solved =
-                        DirectProblemSolver.solveDirectProblem(Australia.center, course, distance)
-
-                    println("wtf point=$it, solved=$solved, dlat=${it.lat - solved.lat}, dlon=${it.lon - solved.lon}, course=$course, distance=$distance")
-
-                    RelativePosition(course, distance)
-                }
             MapView(context).also { mapView ->
                 if (onCameraMoved != null) {
                     state.map = GeoMap(mapView)
@@ -82,11 +71,11 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
                             Coordinates(lat = latitude, lon = longitude)
                         }
 
-                        relatives.forEachIndexed { index, relativePosition ->
+                        relatives.positions.forEachIndexed { index, relativePosition ->
                             val newCoordinate = DirectProblemSolver.solveDirectProblem(
                                 newCenter,
-                                relativePosition.course,
-                                relativePosition.distance,
+                                relativePosition.courseRadians,
+                                relativePosition.distanceMeters,
                             )
                             placemarks[index].geometry = Point(
                                 newCoordinate.lat,

@@ -11,6 +11,12 @@ import kotlin.math.sqrt
 import kotlin.math.tan
 
 object DirectProblemSolver {
+    private const val a = 6378137.0 // экваториальный радиус
+    private const val e2 = 0.00669437999014 // эксцентриситет в квадрате
+    private val f = 1 - sqrt(1.0 - e2) // сжатие
+    private val b = (1 - f) * a // полярный радиус
+    private const val eps = 1e-10 // Точность вычислений
+
     fun solveDirectProblem(
         startPoint: Coordinates,
         courseRadians: Double,
@@ -18,12 +24,6 @@ object DirectProblemSolver {
     ): Coordinates {
         val directionLat = cos(courseRadians)
         val directionLon = sin(courseRadians)
-
-        val a = 6378137.0 // экваториальный радиус
-        val e2 = 0.00669437999014 // эксцентриситет в квадрате
-        val f = 1 - sqrt(1.0 - e2) // сжатие
-        val b = (1 - f) * a // полярный радиус
-        val eps = 1e-10 // Точность вычислений
 
         val actualStartLat = cutLat(startPoint.lat)
 
@@ -49,7 +49,7 @@ object DirectProblemSolver {
             val cos2sigmam = cos(2 * sigmam)
             var i = 0
             var prev = 0.0
-            var change = 0.0
+            var change: Double
 
             do {
                 val dsigma =
