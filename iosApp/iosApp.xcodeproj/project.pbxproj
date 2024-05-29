@@ -116,7 +116,6 @@
 				7555FF77242A565900829871 /* Sources */,
 				B92378962B6B1156000C7307 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				BA2A6A4B2BFA121F00E426B4 /* ShellScript */,
 				FB663961D6433CC5122503F0 /* [CP-User] Embed Flutter Build yandex_pro Script */,
 			);
 			buildRules = (
