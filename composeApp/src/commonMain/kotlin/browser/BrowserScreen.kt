@@ -2,6 +2,7 @@
 
 package browser
 
+import PlatformConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,8 +21,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -35,8 +34,10 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import di.Inject
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.kodein.di.instance
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.browser_background
 import worlds.composeapp.generated.resources.browser_summarize_icon
@@ -272,7 +273,10 @@ private fun Public() {
                 fontWeight = Medium
             )
             TextButton(
-                onClick = { /* TODO(open divkit stories screen)*/ },
+                onClick = {
+                    val platformConfiguration = Inject.di.instance<PlatformConfiguration>()
+                    platformConfiguration.openBrowserDivKitScreen()
+                },
                 contentPadding = PaddingValues(),
                 colors = ButtonDefaults.buttonColors(
                     contentColor = Color(0xFFF25AB5),

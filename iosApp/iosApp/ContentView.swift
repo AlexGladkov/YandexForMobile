@@ -7,7 +7,8 @@ struct ComposeView: UIViewControllerRepresentable {
     var flutterDependencies: FlutterDependencies
 
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController(callback: showFlutter)
+        MainViewControllerKt.MainViewController(openFlutterPro: showFlutter,
+                                                openBrowserDivKit: showBrowserDivKitScreen)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
@@ -39,5 +40,9 @@ struct ContentView: View {
         flutterViewController.isViewOpaque = false
 
         rootViewController.present(flutterViewController, animated: true)
+    }
+
+    func showBrowserDivKitScreen() {
+        // TODO
     }
 }

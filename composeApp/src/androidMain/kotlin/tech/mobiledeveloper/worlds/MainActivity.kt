@@ -2,6 +2,7 @@ package tech.mobiledeveloper.worlds
 
 import App
 import PlatformConfiguration
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,14 +37,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         warmUpEngine()
 
-        PlatformSDK.init(PlatformConfiguration {
+        PlatformSDK.init(PlatformConfiguration({
             startActivity(
                 FlutterActivity.CachedEngineIntentBuilder(
                     FlutterModuleActivity::class.java,
                     "flutter_engine"
                 ).build(this)
             )
-        })
+        }, {
+            startActivity(Intent(this, BrowserDivKitActivity::class.java))
+        }))
 
         setContent {
             val backgroundColor = MaterialTheme.colors.background
