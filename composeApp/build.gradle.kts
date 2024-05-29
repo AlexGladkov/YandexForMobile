@@ -30,17 +30,22 @@ kotlin {
             binaryOption("bundleId", "tech.mobiledeveloper.worlds.Worlds")
         }
     }
-    
+
     sourceSets {
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
-        
+
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
 
         commonMain.dependencies {
@@ -52,6 +57,14 @@ kotlin {
 
             implementation(libs.kviewmodel.odyssey)
             implementation(libs.kodein)
+
+            implementation(libs.ktor.core)
+
+
+            implementation(libs.coil.compose.core)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.mp)
+            implementation(libs.coil.network.ktor)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
