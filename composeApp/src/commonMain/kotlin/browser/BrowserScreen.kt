@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalResourceApi::class)
-
 package browser
 
 import PlatformConfiguration
+import YSFontFamily
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,11 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.Light
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import di.Inject
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.kodein.di.instance
 import worlds.composeapp.generated.resources.Res
@@ -74,7 +73,8 @@ private fun Title() {
         Text(
             text = "Яндекс Браузер",
             fontSize = 28.sp,
-            fontWeight = Medium
+            fontWeight = Medium,
+            fontFamily = YSFontFamily()
         )
         VerticalSpace(12)
 
@@ -83,7 +83,8 @@ private fun Title() {
                     "быстрый и удобной браузер с нейросетями, Алисой, блокировкой рекламы " +
                     "и возможностью синхронизировать пароли и закладки между устройствами. ",
             fontSize = 18.sp,
-            fontWeight = Medium
+            fontWeight = Light,
+            fontFamily = YSFontFamily()
         )
     }
 }
@@ -95,7 +96,8 @@ private fun NeuroBrowser() {
             Text(
                 text = "Вся мощь нейросетей Яндекса",
                 fontSize = 20.sp,
-                fontWeight = Medium
+                fontWeight = Medium,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(12)
             Row {
@@ -110,7 +112,8 @@ private fun NeuroBrowser() {
                     text = "Мы научили браузер переводить для вас видео, сайты и даже текст на картинках, " +
                             "чтобы вам было проще работать с разными языками.",
                     fontSize = 16.sp,
-                    fontWeight = Medium
+                    fontWeight = Light,
+                    fontFamily = YSFontFamily()
                 )
             }
             VerticalSpace(8)
@@ -126,7 +129,8 @@ private fun NeuroBrowser() {
                     text = "Браузер помогает сэкономить время и с помощью YandexGPT " +
                             "пересказывает длинные тексты и видео, чтобы вы сразу понимали главное.",
                     fontSize = 16.sp,
-                    fontWeight = Medium
+                    fontWeight = Light,
+                    fontFamily = YSFontFamily()
                 )
             }
         }
@@ -136,10 +140,12 @@ private fun NeuroBrowser() {
 @Composable
 private fun StrongTeam() {
     Column(modifier = Modifier.padding(16.dp)) {
+        VerticalSpace(4)
         Text(
             text = "Люди",
             fontSize = 20.sp,
-            fontWeight = Medium
+            fontWeight = Medium,
+            fontFamily = YSFontFamily()
         )
         VerticalSpace(12)
 
@@ -148,7 +154,8 @@ private fun StrongTeam() {
                     "от ядра Chromium и инфраструктуры до Backend-Driven UI и перформанса. " +
                     "Всегда найдется разработчик, у кого можно поучиться, обсудить сложную идею и решения. ",
             fontSize = 18.sp,
-            fontWeight = Medium
+            fontWeight = Light,
+            fontFamily = YSFontFamily()
         )
     }
 }
@@ -157,11 +164,12 @@ private fun StrongTeam() {
 private fun OpenSource() {
     val uriHandler = LocalUriHandler.current
     Card {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
             Text(
                 text = "Создаем и развиваем технологии",
                 fontSize = 20.sp,
-                fontWeight = Medium
+                fontWeight = Medium,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(12)
 
@@ -170,14 +178,16 @@ private fun OpenSource() {
                         "создавать новые, а после всегда стараемся сделать их доступными для всех. " +
                         "Любим и вкладываемся в Open source.",
                 fontSize = 16.sp,
-                fontWeight = Medium
+                fontWeight = Light,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(16)
 
             Text(
                 text = "DivKit",
                 fontSize = 18.sp,
-                fontWeight = Bold
+                fontWeight = Light,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(4)
             Text(
@@ -185,7 +195,8 @@ private fun OpenSource() {
                         "Позволяет получать верстку для приложений с сервера и обновлять UI " +
                         "без выпуска новых версий.",
                 fontSize = 16.sp,
-                fontWeight = Medium
+                fontWeight = Light,
+                fontFamily = YSFontFamily()
             )
             TextButton(
                 onClick = { uriHandler.openUri("https://github.com/divkit/divkit") },
@@ -198,7 +209,8 @@ private fun OpenSource() {
                     Text(
                         "Перейти на Github",
                         fontSize = 16.sp,
-                        fontWeight = Medium
+                        fontWeight = Light,
+                        fontFamily = YSFontFamily()
                     )
                 }
             )
@@ -207,14 +219,16 @@ private fun OpenSource() {
             Text(
                 text = "Yatagan",
                 fontSize = 18.sp,
-                fontWeight = Bold
+                fontWeight = Bold,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(4)
             Text(
                 text = "DI-фреймворк, совместимый по API с Dagger, позволяющий значительно ускорить " +
                         "сборку Android-проекта и расширяющий возможности DI.",
                 fontSize = 16.sp,
-                fontWeight = Medium
+                fontWeight = Light,
+                fontFamily = YSFontFamily()
             )
             TextButton(
                 onClick = { uriHandler.openUri("https://github.com/yandex/yatagan") },
@@ -227,7 +241,8 @@ private fun OpenSource() {
                     Text(
                         "Перейти на Github",
                         fontSize = 16.sp,
-                        fontWeight = Medium
+                        fontWeight = Light,
+                        fontFamily = YSFontFamily()
                     )
                 }
             )
@@ -238,10 +253,12 @@ private fun OpenSource() {
 @Composable
 private fun FastAndSecure() {
     Column(modifier = Modifier.padding(16.dp)) {
+        VerticalSpace(4)
         Text(
             text = "Быстрый и безопасный",
             fontSize = 20.sp,
-            fontWeight = Medium
+            fontWeight = Medium,
+            fontFamily = YSFontFamily()
         )
         VerticalSpace(12)
 
@@ -249,7 +266,8 @@ private fun FastAndSecure() {
             text = "Мы много и усилий тратим на то, чтобы сделать наш браузер самым быстрым и удобным. " +
                     "\nА также мы обучили нейросети распознавать фишинговые сайты и предупреждать пользователя об этом.",
             fontSize = 18.sp,
-            fontWeight = Medium
+            fontWeight = Light,
+            fontFamily = YSFontFamily()
         )
     }
 }
@@ -257,11 +275,12 @@ private fun FastAndSecure() {
 @Composable
 private fun Public() {
     Card {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
             Text(
                 text = "Активно делимся экспертизой",
                 fontSize = 20.sp,
-                fontWeight = Medium
+                fontWeight = Medium,
+                fontFamily = YSFontFamily()
             )
             VerticalSpace(12)
 
@@ -270,7 +289,8 @@ private fun Public() {
                         "поэтому стараемся много выступать на конференциях и митапах, " +
                         "пишем технические статьи и вкладываемся в рост разработчиков и сообщества.",
                 fontSize = 16.sp,
-                fontWeight = Medium
+                fontWeight = Light,
+                fontFamily = YSFontFamily()
             )
             TextButton(
                 onClick = {
@@ -286,7 +306,8 @@ private fun Public() {
                     Text(
                         "Смотреть подробнее",
                         fontSize = 16.sp,
-                        fontWeight = Medium
+                        fontWeight = Light,
+                        fontFamily = YSFontFamily()
                     )
                 }
             )
