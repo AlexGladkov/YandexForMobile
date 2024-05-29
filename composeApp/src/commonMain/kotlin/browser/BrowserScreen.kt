@@ -4,27 +4,34 @@ package browser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Medium
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,73 +39,275 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.browser_background
-
-private val browserData = browserItems()
+import worlds.composeapp.generated.resources.browser_summarize_icon
+import worlds.composeapp.generated.resources.browser_translate_icon
 
 @Composable
 fun BrowserScreen() {
-    Box(modifier = Modifier.background(Color(0x88EEEEEE))) {
+    Box {
         Image(
             painter = painterResource(Res.drawable.browser_background),
             modifier = Modifier.fillMaxSize(),
             contentDescription = "Background Image",
             contentScale = ContentScale.Crop
         )
-        Column(modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.systemBars)) {
-            Text(text = "Яндекс Браузер", fontSize = 28.sp, fontWeight = Medium)
-            Spacer(modifier = Modifier.height(16.dp))
+        LazyColumn(modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)) {
+            item { Title() }
+
+            item { NeuroBrowser() }
+
+            item { StrongTeam() }
+
+            item { OpenSource() }
+
+            item { FastAndSecure() }
+
+            item { Public() }
+        }
+    }
+}
+
+@Composable
+private fun Title() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Яндекс Браузер",
+            fontSize = 28.sp,
+            fontWeight = Medium
+        )
+        VerticalSpace(12)
+
+        Text(
+            text = "Яндекс Браузер – одно из крупнейших приложений Яндекса, " +
+                    "быстрый и удобной браузер с нейросетями, Алисой, блокировкой рекламы " +
+                    "и возможностью синхронизировать пароли и закладки между устройствами. ",
+            fontSize = 18.sp,
+            fontWeight = Medium
+        )
+    }
+}
+
+@Composable
+private fun NeuroBrowser() {
+    Card {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Яндекс Браузер – одно из крупнейших приложений Яндекса, " +
-                        "быстрый и удобной браузер с нейросетями, Алисой, блокировкой рекламы " +
-                        "и возможностью синхронизировать пароли и закладки между устройствами. ",
-                fontSize = 18.sp,
+                text = "Вся мощь нейросетей Яндекса",
+                fontSize = 20.sp,
                 fontWeight = Medium
             )
+            VerticalSpace(12)
+            Row {
+                Image(
+                    painter = painterResource(Res.drawable.browser_translate_icon),
+                    contentDescription = "Browser translate power",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(40.dp)
+                )
+                HorizontalSpace(8)
+                Text(
+                    text = "Мы научили браузер переводить для вас видео, сайты и даже текст на картинках, " +
+                            "чтобы вам было проще работать с разными языками.",
+                    fontSize = 16.sp,
+                    fontWeight = Medium
+                )
+            }
+            VerticalSpace(8)
+            Row {
+                Image(
+                    painter = painterResource(Res.drawable.browser_summarize_icon),
+                    contentDescription = "Browser summarize power",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(40.dp)
+                )
+                HorizontalSpace(8)
+                Text(
+                    text = "Браузер помогает сэкономить время и с помощью YandexGPT " +
+                            "пересказывает длинные тексты и видео, чтобы вы сразу понимали главное.",
+                    fontSize = 16.sp,
+                    fontWeight = Medium
+                )
+            }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(20.dp))
+@Composable
+private fun StrongTeam() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Люди",
+            fontSize = 20.sp,
+            fontWeight = Medium
+        )
+        VerticalSpace(12)
 
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                verticalItemSpacing = 16.dp,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+        Text(
+            text = "У нас большая команда сильных разработчиков, которые обладают большой экспертизой в разных областях: " +
+                    "от ядра Chromium и инфраструктуры до Backend-Driven UI и перформанса. " +
+                    "Всегда найдется разработчик, у кого можно поучиться, обсудить сложную идею и решения. ",
+            fontSize = 18.sp,
+            fontWeight = Medium
+        )
+    }
+}
+
+@Composable
+private fun OpenSource() {
+    val uriHandler = LocalUriHandler.current
+    Card {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Создаем и развиваем технологии",
+                fontSize = 20.sp,
+                fontWeight = Medium
+            )
+            VerticalSpace(12)
+
+            Text(
+                text = "Для наших задач не всегда хватает готовых решений, поэтому мы не боимся " +
+                        "создавать новые, а после всегда стараемся сделать их доступными для всех. " +
+                        "Любим и вкладываемся в Open source.",
+                fontSize = 16.sp,
+                fontWeight = Medium
+            )
+            VerticalSpace(16)
+
+            Text(
+                text = "DivKit",
+                fontSize = 18.sp,
+                fontWeight = Bold
+            )
+            VerticalSpace(4)
+            Text(
+                text = "Backend-Driven UI фреймворк для Android, iOS, Flutter и Web. " +
+                        "Позволяет получать верстку для приложений с сервера и обновлять UI " +
+                        "без выпуска новых версий.",
+                fontSize = 16.sp,
+                fontWeight = Medium
+            )
+            TextButton(
+                onClick = { uriHandler.openUri("https://github.com/divkit/divkit") },
+                contentPadding = PaddingValues(),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color(0xFFF25AB5),
+                    backgroundColor = Color.Transparent
+                ),
                 content = {
-                    items(browserData.size) { index ->
-                        AppItem(browserData[index])
-                    }
-                },
-                modifier = Modifier.fillMaxSize()
+                    Text(
+                        "Перейти на Github",
+                        fontSize = 16.sp,
+                        fontWeight = Medium
+                    )
+                }
+            )
+            VerticalSpace(8)
+
+            Text(
+                text = "Yatagan",
+                fontSize = 18.sp,
+                fontWeight = Bold
+            )
+            VerticalSpace(4)
+            Text(
+                text = "DI-фреймворк, совместимый по API с Dagger, позволяющий значительно ускорить " +
+                        "сборку Android-проекта и расширяющий возможности DI.",
+                fontSize = 16.sp,
+                fontWeight = Medium
+            )
+            TextButton(
+                onClick = { uriHandler.openUri("https://github.com/yandex/yatagan") },
+                contentPadding = PaddingValues(),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color(0xFFF25AB5),
+                    backgroundColor = Color.Transparent
+                ),
+                content = {
+                    Text(
+                        "Перейти на Github",
+                        fontSize = 16.sp,
+                        fontWeight = Medium
+                    )
+                }
             )
         }
     }
 }
 
 @Composable
-private fun AppItem(browserItem: BrowserItem) {
-    Box(
-        modifier = Modifier
-            .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .height(200.dp)
-            .background(browserItem.backgroundColor),
-        contentAlignment = Alignment.TopStart
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            Image(
-                painter = painterResource(browserItem.icon),
-                modifier = Modifier.size(browserItem.iconSize.dp),
-                contentDescription = "Иконка для ${browserItem.title}",
-                contentScale = ContentScale.Crop
-            )
-        }
+private fun FastAndSecure() {
+    Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = browserItem.title,
+            text = "Быстрый и безопасный",
             fontSize = 20.sp,
-            modifier = Modifier.padding(start = 10.dp, top = 12.dp)
+            fontWeight = Medium
+        )
+        VerticalSpace(12)
+
+        Text(
+            text = "Мы много и усилий тратим на то, чтобы сделать наш браузер самым быстрым и удобным. " +
+                    "\nА также мы обучили нейросети распознавать фишинговые сайты и предупреждать пользователя об этом.",
+            fontSize = 18.sp,
+            fontWeight = Medium
         )
     }
+}
+
+@Composable
+private fun Public() {
+    Card {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Активно делимся экспертизой",
+                fontSize = 20.sp,
+                fontWeight = Medium
+            )
+            VerticalSpace(12)
+
+            Text(
+                text = "Мы любим и считаем важным рассказывать про наш опыт и решения вовне, " +
+                        "поэтому стараемся много выступать на конференциях и митапах, " +
+                        "пишем технические статьи и вкладываемся в рост разработчиков и сообщества.",
+                fontSize = 16.sp,
+                fontWeight = Medium
+            )
+            TextButton(
+                onClick = { /* TODO(open divkit stories screen)*/ },
+                contentPadding = PaddingValues(),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color(0xFFF25AB5),
+                    backgroundColor = Color.Transparent
+                ),
+                content = {
+                    Text(
+                        "Смотреть подробнее",
+                        fontSize = 16.sp,
+                        fontWeight = Medium
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun Card(content: @Composable BoxScope.() -> Unit) {
+    Box(
+        modifier = Modifier
+            .shadow(elevation = 10.dp)
+            .fillMaxWidth()
+            .background(Color.White),
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun VerticalSpace(height: Int) {
+    Spacer(modifier = Modifier.height(height.dp))
+}
+
+@Composable
+private fun HorizontalSpace(width: Int) {
+    Spacer(modifier = Modifier.width(width.dp))
 }
