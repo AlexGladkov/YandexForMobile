@@ -32,6 +32,11 @@ kotlin {
     }
     
     sourceSets {
+        all {
+            languageSettings {
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
         
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)

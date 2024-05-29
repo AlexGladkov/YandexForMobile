@@ -13,11 +13,12 @@ import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.configuration.DefaultModalConfiguration
 import ru.alexgladkov.odyssey.core.configuration.DisplayType
 
-fun MainViewController(openFlutterPro: () -> Unit) = ComposeUIViewController {
+fun MainViewController(openFlutterPro: () -> Unit,
+                       openBrowserDivKit: () -> Unit) = ComposeUIViewController {
     val rootController = remember { RootComposeBuilder().apply { navigationGraph() }.build() }
     rootController.setupWithViewModels()
 
-    PlatformSDK.init(PlatformConfiguration(openFlutterPro))
+    PlatformSDK.init(PlatformConfiguration(openFlutterPro, openBrowserDivKit))
     
     val backgroundColor = MaterialTheme.colors.background
     rootController.backgroundColor = backgroundColor

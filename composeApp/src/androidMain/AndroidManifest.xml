@@ -27,6 +27,10 @@
             android:windowSoftInputMode="adjustResize">
 
         </activity>
+
+        <activity
+            android:name=".BrowserDivKitActivity"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
     </application>
 
 </manifest>
