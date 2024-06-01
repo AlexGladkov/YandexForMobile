@@ -2,6 +2,7 @@ plugins {
     id(libs.plugins.android.application.get().pluginId)
     id(libs.plugins.kotlin.get().pluginId)
     id(libs.plugins.compose.get().pluginId)
+    id(libs.plugins.cocoapods.get().pluginId)
 }
 
 kotlin {
@@ -10,6 +11,20 @@ kotlin {
             kotlinOptions {
                 jvmTarget = "11"
             }
+        }
+    }
+    cocoapods {
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "12.0"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "ComposeApp"
+        }
+
+        pod("YandexMapsMobile") {
+            version = "4.6.1-lite"
         }
     }
 
