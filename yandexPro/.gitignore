@@ -1,9 +1,12 @@
 .DS_Store
 .dart_tool/
 
+.fvm
+
 .pub/
 
 .idea/
+.vscode/
 .vagrant/
 .sconsign.dblite
 .svn/
@@ -47,3 +50,5 @@ app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+
+example/*
