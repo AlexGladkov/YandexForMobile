@@ -186,7 +186,7 @@ private fun OpenSource() {
             Text(
                 text = "DivKit",
                 fontSize = 18.sp,
-                fontWeight = Light,
+                fontWeight = Bold,
                 fontFamily = YSFontFamily()
             )
             VerticalSpace(4)
