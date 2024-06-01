@@ -28,6 +28,9 @@ compose-plugin = "1.6.0"
 junit = "4.13.2"
 coil = "3.0.0-alpha06"
 
+androidStories = "1.1.1"
+divCore = "30.2.0"
+
 [libraries]
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
@@ -71,6 +74,14 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+
+android-stories = { module = "com.github.redmadrobot-tomsk:android-stories", version.ref = "androidStories" }
+
+div = { module = "com.yandex.div:div", version.ref = "divCore" }
+div-core = { module = "com.yandex.div:div-core", version.ref = "divCore" }
+div-picasso = { module = "com.yandex.div:picasso", version.ref = "divCore" }
+div-json = { module = "com.yandex.div:div-json", version.ref = "divCore" }
+div-fonts = { module = "com.yandex.div:fonts", version.ref = "divCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "plugin-android" }
