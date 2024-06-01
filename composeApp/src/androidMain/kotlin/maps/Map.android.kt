@@ -7,21 +7,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.viewinterop.AndroidView
-import com.yandex.mapkit.geometry.Geo
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import maps.bindings.GeoMap
+import maps.bindings.GeoUtils
 import maps.data.Australia
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.imageResource
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.map_dot
-import kotlin.math.PI
 import com.yandex.mapkit.map.CameraPosition as MapkitCameraPosition
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
     var savedCameraListener by remember { mutableStateOf<CameraListener?>(null) }
@@ -34,7 +32,8 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
                 Australia.center.lat,
                 Australia.center.lon,
             )
-            val relatives = calculateRelativeContour(Australia.center, Australia.coordinates)
+            val relatives =
+                GeoUtils.calculateRelativeContour(Australia.center, Australia.coordinates)
 
             MapView(context).also { mapView ->
                 if (onCameraMoved != null) {

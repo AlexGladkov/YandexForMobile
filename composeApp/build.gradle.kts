@@ -11,6 +11,9 @@ kotlin {
             kotlinOptions {
                 jvmTarget = "11"
             }
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
         }
     }
     cocoapods {
@@ -50,6 +53,9 @@ kotlin {
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlin.experimental.ExperimentalNativeApi")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlinx.cinterop.BetaInteropApi")
             }
         }
 
