@@ -43,9 +43,8 @@ import maps.bindings.GeoCameraPosition
 import maps.bindings.GeoMapCameraListener
 import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoUtils
+import maps.bindings.withPoint
 import maps.bindings.createMapkitPoint
-import maps.bindings.lat
-import maps.bindings.lon
 import maps.bindings.point
 import maps.data.Australia
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -95,7 +94,6 @@ private fun MapLayout() {
                 )
                 val placemarksCollection = map.addCollection()
 
-
                 val placemarks = Australia.coordinates.map { position ->
                     placemarksCollection.addPlacemark().apply {
                         setGeometry(createMapkitPoint(position.lat, position.lon))
@@ -103,13 +101,13 @@ private fun MapLayout() {
                     }
                 }
 
+                map.moveCamera(map.cameraPosition().withPoint(point = initialCenter))
+
                 val listener = object : GeoMapCameraListener {
                     override fun onCameraPositionChanged(
                         position: GeoCameraPosition,
                         finished: Boolean
                     ) {
-                        config.log("wtf onCameraPositionChanged (${position.point.lat}, ${position.point.lon}")
-
                         val newCenter = position.point
                         relatives.positions.forEachIndexed { index, relativePosition ->
                             val newCoordinate = DirectProblemSolver.solveDirectProblem(

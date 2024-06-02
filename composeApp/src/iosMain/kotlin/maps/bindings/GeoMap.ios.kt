@@ -1,6 +1,8 @@
 package maps.bindings
 
 import androidx.compose.ui.graphics.ImageBitmap
+import cocoapods.YandexMapsMobile.YMKAnimation
+import cocoapods.YandexMapsMobile.YMKAnimationType
 import cocoapods.YandexMapsMobile.YMKCameraPosition
 import cocoapods.YandexMapsMobile.YMKCameraUpdateReason
 import cocoapods.YandexMapsMobile.YMKMap
@@ -43,6 +45,14 @@ actual typealias GeoScreenPoint = YMKScreenPoint
 actual typealias GeoCameraPosition = YMKCameraPosition
 
 actual class GeoMap(private val mapView: YMKMapView) {
+    private inline fun <R> withMap(block: YMKMap.() -> R): R {
+        return withMapWindow { map.block() }
+    }
+
+    private inline fun <R> withMapWindow(block: YMKMapWindow.() -> R): R {
+        return mapView.mapWindow?.let(block)!!
+    }
+
     actual fun screenToWorld(screenPoint: GeoScreenPoint): MapkitPoint? {
         return withMapWindow { screenToWorldWithScreenPoint(screenPoint) }
     }
@@ -63,12 +73,22 @@ actual class GeoMap(private val mapView: YMKMapView) {
         withMap { mapObjects.removeWithMapObject((collection as GeoMapObjectCollectionImpl).impl) }
     }
 
-    private inline fun <R> withMap(block: YMKMap.() -> R): R {
-        return withMapWindow { map.block() }
+    actual fun moveCamera(position: GeoCameraPosition, animated: Boolean) {
+        withMap {
+            if (animated) {
+                moveWithCameraPosition(
+                    position,
+                    YMKAnimation.animationWithType(YMKAnimationType.YMKAnimationTypeLinear, 300f),
+                    null,
+                )
+            } else {
+                moveWithCameraPosition(position)
+            }
+        }
     }
 
-    private inline fun <R> withMapWindow(block: YMKMapWindow.() -> R): R {
-        return mapView.mapWindow?.let(block)!!
+    actual fun cameraPosition(): GeoCameraPosition {
+        return withMap { cameraPosition() }
     }
 }
 
@@ -162,28 +182,14 @@ actual abstract class GeoPlacemarkImage {
 
 class GeoPlacemarkImageImpl(override val wrapped: UIImage) : GeoPlacemarkImage()
 
-actual fun ImageBitmap.asGeoPlacemarkImage(): GeoPlacemarkImage {
-    /**
-     * let bitsPerComponent: UInt = 8
-     *     let bitsPerPixel: UInt = 32
-     *     let
-     *     let
-     *
-     *     var data = pixels
-     *     let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &data, length: data.count * sizeof(PixelData)))
-     *     let providerRefthing: CGDataProvider = providerRef
-     *     let cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, width * UInt(sizeof(PixelData)), rgbColorSpace, bitmapInfo, providerRef, nil, true, kCGRenderingIntentDefault)
-     *     let cgiimagething: CGImage = cgImage
-     *     return UIImage(CGImage: cgImage)
-     */
-    val storage = IntArray(width * height)
-    readPixels(storage)
-
-    val nsData = storage.toNSData()
-
-    val uiImage = UIImage.imageWithData(nsData)
-    return GeoPlacemarkImageImpl(uiImage ?: UIImage())
-}
-
 actual val GeoCameraPosition.point: MapkitPoint
     get() = target
+
+actual fun GeoCameraPosition.withPoint(point: MapkitPoint): GeoCameraPosition {
+    return YMKCameraPosition.cameraPositionWithTarget(
+        point,
+        zoom,
+        azimuth,
+        tilt,
+    )
+}
