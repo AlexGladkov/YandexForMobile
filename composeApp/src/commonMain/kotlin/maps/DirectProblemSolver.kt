@@ -1,5 +1,8 @@
 package maps
 
+import maps.bindings.MapkitPoint
+import maps.bindings.lat
+import maps.bindings.lon
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -18,7 +21,7 @@ object DirectProblemSolver {
     private const val eps = 1e-10 // Точность вычислений
 
     fun solveDirectProblem(
-        startPoint: Coordinates,
+        startPoint: MapkitPoint,
         courseRadians: Double,
         distance: Double
     ): Coordinates {

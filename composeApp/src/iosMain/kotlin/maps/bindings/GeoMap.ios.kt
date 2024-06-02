@@ -1,7 +1,6 @@
 package maps.bindings
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asSkiaBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import cocoapods.YandexMapsMobile.YMKCameraPosition
 import cocoapods.YandexMapsMobile.YMKCameraUpdateReason
 import cocoapods.YandexMapsMobile.YMKMap
@@ -11,17 +10,25 @@ import cocoapods.YandexMapsMobile.YMKMapView
 import cocoapods.YandexMapsMobile.YMKMapWindow
 import cocoapods.YandexMapsMobile.YMKPlacemarkMapObject
 import cocoapods.YandexMapsMobile.YMKScreenPoint
-import coil3.asCoilImage
 import kotlinx.cinterop.COpaque
+import kotlinx.cinterop.UByteVar
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.interpretCPointer
+import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.objcPtr
+import kotlinx.cinterop.toCValues
 import kotlinx.cinterop.usePinned
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.painterResource
-import platform.Foundation.NSCoder
+import platform.CoreCrypto.CC_SHA256
+import platform.CoreCrypto.CC_SHA256_DIGEST_LENGTH
+import platform.CoreFoundation.CFDataCreate
+import platform.CoreFoundation.CFDataRef
+import platform.CoreGraphics.CGBitmapInfo
+import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
+import platform.CoreGraphics.CGDataProviderCreateWithCFData
+import platform.CoreGraphics.CGImageAlphaInfo
+import platform.CoreGraphics.CGImageCreate
 import platform.Foundation.NSData
 import platform.Foundation.NSMutableData
 import platform.Foundation.appendBytes
@@ -30,8 +37,6 @@ import platform.darwin.NSObject
 import platform.objc.OBJC_ASSOCIATION_RETAIN
 import platform.objc.objc_getAssociatedObject
 import platform.objc.objc_setAssociatedObject
-import worlds.composeapp.generated.resources.Res
-import worlds.composeapp.generated.resources.map_dot
 import kotlin.native.ref.WeakReference
 
 actual typealias GeoScreenPoint = YMKScreenPoint
@@ -116,9 +121,13 @@ actual fun makeGeoScreenPoint(x: Float, y: Float): GeoScreenPoint {
     return YMKScreenPoint.screenPointWithX(x = x, y = y)
 }
 
-actual interface GeoMapObjectCollection
+actual interface GeoMapObjectCollection {
+    actual fun addPlacemark(): GeoPlacemark
+}
 
-class GeoMapObjectCollectionImpl(val impl: YMKMapObjectCollection) : GeoMapObjectCollection
+class GeoMapObjectCollectionImpl(val impl: YMKMapObjectCollection) : GeoMapObjectCollection {
+    override fun addPlacemark(): GeoPlacemark = GeoPlacemarkImpl(impl.addPlacemark())
+}
 
 actual interface GeoPlacemark {
     actual fun setGeometry(point: MapkitPoint)
@@ -153,11 +162,28 @@ actual abstract class GeoPlacemarkImage {
 
 class GeoPlacemarkImageImpl(override val wrapped: UIImage) : GeoPlacemarkImage()
 
-@Composable
-actual fun DrawableResource.readAsGeoPlacemarkImage(): GeoPlacemarkImage {
-    return imageResource(Res.drawable.map_dot).run {
-        val storage = IntArray(width * height)
-        readPixels(storage)
-        GeoPlacemarkImageImpl(UIImage(storage.toNSData()))
-    }
+actual fun ImageBitmap.asGeoPlacemarkImage(): GeoPlacemarkImage {
+    /**
+     * let bitsPerComponent: UInt = 8
+     *     let bitsPerPixel: UInt = 32
+     *     let
+     *     let
+     *
+     *     var data = pixels
+     *     let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &data, length: data.count * sizeof(PixelData)))
+     *     let providerRefthing: CGDataProvider = providerRef
+     *     let cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, width * UInt(sizeof(PixelData)), rgbColorSpace, bitmapInfo, providerRef, nil, true, kCGRenderingIntentDefault)
+     *     let cgiimagething: CGImage = cgImage
+     *     return UIImage(CGImage: cgImage)
+     */
+    val storage = IntArray(width * height)
+    readPixels(storage)
+
+    val nsData = storage.toNSData()
+
+    val uiImage = UIImage.imageWithData(nsData)
+    return GeoPlacemarkImageImpl(uiImage ?: UIImage())
 }
+
+actual val GeoCameraPosition.point: MapkitPoint
+    get() = target

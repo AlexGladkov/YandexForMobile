@@ -1,7 +1,6 @@
 package maps.bindings
 
-import androidx.compose.runtime.Composable
-import org.jetbrains.compose.resources.DrawableResource
+import androidx.compose.ui.graphics.ImageBitmap
 
 
 interface GeoMapCameraListener {
@@ -13,6 +12,7 @@ expect class GeoScreenPoint
 expect fun makeGeoScreenPoint(x: Float, y: Float): GeoScreenPoint
 
 expect class GeoCameraPosition
+expect val GeoCameraPosition.point: MapkitPoint
 
 expect class GeoMap {
     fun screenToWorld(screenPoint: GeoScreenPoint): MapkitPoint?
@@ -22,7 +22,9 @@ expect class GeoMap {
     fun removeCollection(collection: GeoMapObjectCollection)
 }
 
-expect interface GeoMapObjectCollection
+expect interface GeoMapObjectCollection {
+    fun addPlacemark(): GeoPlacemark
+}
 expect abstract class GeoPlacemarkImage
 
 expect interface GeoPlacemark {
@@ -30,5 +32,4 @@ expect interface GeoPlacemark {
     fun setIcon(image: GeoPlacemarkImage)
 }
 
-@Composable
-expect fun DrawableResource.readAsGeoPlacemarkImage(): GeoPlacemarkImage
+expect fun ImageBitmap.asGeoPlacemarkImage(): GeoPlacemarkImage

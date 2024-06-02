@@ -9,10 +9,21 @@ struct ComposeView: UIViewControllerRepresentable {
     var showBrowserDivKitScreen: () -> Void
 
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController(openFlutterPro: showFlutter, openBrowserDivKit: showBrowserDivKitScreen)
+        MainViewControllerKt.MainViewController(
+            openFlutterPro: showFlutter,
+            openBrowserDivKit: showBrowserDivKitScreen,
+            mapsConfig: CoreMapsConfig(
+                dotImage: UIImage(named: "map_dot")!,
+                log: log
+            )
+        )
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    
+    func log(message: String) {
+        NSLog(message)
+    }
 }
 
 struct ContentView: View {

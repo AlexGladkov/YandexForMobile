@@ -2,6 +2,8 @@
 
 package maps
 
+import MapsConfig
+import PlatformConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +25,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -34,8 +38,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import di.Inject
+import maps.bindings.GeoCameraPosition
+import maps.bindings.GeoMapCameraListener
+import maps.bindings.GeoPlacemarkImage
+import maps.bindings.GeoUtils
+import maps.bindings.createMapkitPoint
+import maps.bindings.lat
+import maps.bindings.lon
+import maps.bindings.point
+import maps.data.Australia
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.kodein.di.instance
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.browser_background
 
@@ -50,6 +65,9 @@ fun MapsScreenView() {
 }
 
 @Composable
+expect fun MapsConfig.dotConfig(): GeoPlacemarkImage
+
+@Composable
 private fun MapLayout() {
     val mapState by remember { mutableStateOf(MapState()) }
 
@@ -60,8 +78,59 @@ private fun MapLayout() {
                 println("wtf camera move $it")
             }
         }
-        LaunchedEffect(Unit) {
 
+        val config by derivedStateOf { Inject.di.instance<PlatformConfiguration>().mapsConfig() }
+        val image = config.dotConfig()
+        var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
+
+        LaunchedEffect(Unit) {
+            mapState.map?.let { map ->
+                val initialCenter = createMapkitPoint(
+                    Australia.center.lat,
+                    Australia.center.lon,
+                )
+                val relatives = GeoUtils.calculateRelativeContour(
+                    Australia.center,
+                    Australia.coordinates,
+                )
+                val placemarksCollection = map.addCollection()
+
+
+                val placemarks = Australia.coordinates.map { position ->
+                    placemarksCollection.addPlacemark().apply {
+                        setGeometry(createMapkitPoint(position.lat, position.lon))
+                        setIcon(image)
+                    }
+                }
+
+                val listener = object : GeoMapCameraListener {
+                    override fun onCameraPositionChanged(
+                        position: GeoCameraPosition,
+                        finished: Boolean
+                    ) {
+                        config.log("wtf onCameraPositionChanged (${position.point.lat}, ${position.point.lon}")
+
+                        val newCenter = position.point
+                        relatives.positions.forEachIndexed { index, relativePosition ->
+                            val newCoordinate = DirectProblemSolver.solveDirectProblem(
+                                newCenter,
+                                relativePosition.courseRadians,
+                                relativePosition.distanceMeters,
+                            )
+                            placemarks[index].setGeometry(
+                                createMapkitPoint(
+                                    newCoordinate.lat,
+                                    newCoordinate.lon,
+                                )
+                            )
+                        }
+                    }
+                }
+
+                savedCameraListener = listener
+                map.addCameraListener(listener)
+
+            } ?: config.log("wtf map not found")
         }
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight()
