@@ -1,9 +1,16 @@
 package maps.bindings
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.asAndroidBitmap
 import com.yandex.mapkit.ScreenPoint
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.imageResource
 
 actual typealias GeoScreenPoint = ScreenPoint
 actual typealias GeoCameraPosition = CameraPosition
@@ -25,6 +32,26 @@ actual class GeoMap(private val view: MapView) {
     }
 
     actual fun removeCameraListener(listener: GeoMapCameraListener) {
-        listenersMap[listener]?.let(view.mapWindow.map::removeCameraListener)
+        listenersMap.remove(listener)?.let(view.mapWindow.map::removeCameraListener)
     }
+
+    actual fun addCollection(): GeoMapObjectCollection {
+        return view.mapWindow.map.mapObjects.addCollection()
+    }
+
+    actual fun removeCollection(collection: GeoMapObjectCollection) {
+        view.mapWindow.map.mapObjects.remove(collection)
+    }
+}
+
+actual fun makeGeoScreenPoint(x: Float, y: Float): GeoScreenPoint = ScreenPoint(x, y)
+actual typealias GeoMapObjectCollection = MapObjectCollection
+
+actual typealias GeoPlacemark = PlacemarkMapObject
+
+actual typealias GeoPlacemarkImage = ImageProvider
+
+@Composable
+actual fun DrawableResource.readAsGeoPlacemarkImage(): GeoPlacemarkImage {
+    return ImageProvider.fromBitmap(imageResource(this).asAndroidBitmap())
 }

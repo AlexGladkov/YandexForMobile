@@ -37,12 +37,11 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
 
             MapView(context).also { mapView ->
                 if (onCameraMoved != null) {
-                    state.map = GeoMap(mapView)
+                    val map = GeoMap(mapView).also { state.map = it }
 
-                    val placemarksCollection =
-                        mapView.mapWindow.map.mapObjects.addCollection().also {
-                            collection = it
-                        }
+                    val placemarksCollection = map.addCollection().also {
+                        collection = it
+                    }
 
                     val placemarks = Australia.coordinates.map { position ->
                         placemarksCollection.addPlacemark().apply {
