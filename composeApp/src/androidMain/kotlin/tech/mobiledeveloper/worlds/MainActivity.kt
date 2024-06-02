@@ -2,7 +2,6 @@ package tech.mobiledeveloper.worlds
 
 import App
 import PlatformConfiguration
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +25,7 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.configuration.DefaultModalConfiguration
 import ru.alexgladkov.odyssey.core.configuration.DisplayType
+import tech.mobiledeveloper.worlds.browser.BrowserStoriesLauncher
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 ).build(this)
             )
         }, {
-            startActivity(Intent(this, BrowserDivKitActivity::class.java))
+            BrowserStoriesLauncher.launchStories(this)
         }))
 
         setContent {

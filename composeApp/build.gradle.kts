@@ -109,6 +109,13 @@ android {
         debugImplementation(libs.compose.ui.tooling)
         debugImplementation("ru.alexgladkov.odyssey.yandex_pro:flutter_debug:1.0")
         releaseImplementation("ru.alexgladkov.odyssey.yandex_pro:flutter_release:1.0")
+
+        implementation(libs.android.stories)
+        implementation(libs.div.core)
+        implementation(libs.div)
+        implementation(libs.div.json)
+        implementation(libs.div.picasso)
+        implementation(libs.div.fonts)
     }
 }
 

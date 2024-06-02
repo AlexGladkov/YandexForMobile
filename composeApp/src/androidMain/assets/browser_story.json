@@ -1,0 +1,308 @@
+{
+  "templates": {
+    "image_block": {
+      "type": "image",
+      "height": {
+        "type": "fixed",
+        "value": 220
+      },
+      "width": {
+        "type": "match_parent"
+      },
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 8,
+        "bottom": 16
+      }
+    },
+    "title": {
+      "type": "text",
+      "font_size": 22,
+      "line_height": 24,
+      "font_weight": "bold",
+      "paddings": {
+        "left": 24,
+        "right": 24,
+        "bottom": 16
+      }
+    },
+    "subtitle": {
+      "font_size": 16,
+      "line_height": 20,
+      "type": "text",
+      "paddings": {
+        "left": 24,
+        "right": 24
+      },
+      "margins": {
+        "bottom": 16
+      }
+    },
+    "action_button": {
+      "type": "text",
+      "width": {
+        "type": "match_parent"
+      },
+      "height": {
+        "type": "wrap_content"
+      },
+      "paddings": {
+        "left": 24,
+        "top": 16,
+        "right": 16,
+        "bottom": 16
+      },
+      "margins": {
+        "left": 24,
+        "right": 24
+      },
+      "border": {
+        "corner_radius": 8
+      },
+      "background": [
+        {
+          "type": "solid",
+          "color": "#0E000000"
+        }
+      ],
+      "font_size": 18,
+      "font_weight": "medium",
+      "text_alignment_vertical": "center",
+      "text_alignment_horizontal": "center",
+      "text_color": "#000000"
+    }
+  },
+  "cards": [
+    {
+      "log_id": "habr_perf_ios",
+      "states": [
+        {
+          "state_id": 0,
+          "div": {
+            "type": "container",
+            "orientation": "vertical",
+            "margins": {
+              "top": 96
+            },
+            "items": [
+              {
+                "type": "title",
+                "text": "Перф-тесты VS аномалии. Вечная битва за производительность приложений на iOS."
+              },
+              {
+                "type": "container",
+                "orientation": "vertical",
+                "content_alignment_horizontal": "center",
+                "items": [
+                  {
+                    "type": "image_block",
+                    "image_url": "https://habrastorage.org/r/w1560/getpro/habr/upload_files/87c/988/f18/87c988f18567833a463a0018ed7a4a9e.png"
+                  }
+                ]
+              },
+              {
+                "type": "subtitle",
+                "text": "Чем больше задач у приложения, тем важнее контролировать его производительность. На примере Яндекс Браузера разбирем, как мы отслеживаем аномалии метрик на клиентской стороне с помощью перф-тестов. Основные принципы универсальны, и вы легко сможете использовать их для других типов приложений."
+              },
+              {
+                "type": "action_button",
+                "text": "Читать на Хабре",
+                "actions": [
+                  {
+                    "log_id": "open_url_1",
+                    "url": "https://habr.com/ru/companies/yandex/articles/761388/"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "log_id": "habr_yatagan",
+      "states": [
+        {
+          "state_id": 0,
+          "div": {
+            "type": "container",
+            "orientation": "vertical",
+            "margins": {
+              "top": 96
+            },
+            "items": [
+              {
+                "type": "title",
+                "text": "Яндекс выпускает Yatagan — опенсорс-фреймворк для внедрения зависимостей, позволяющий ускорить сборку"
+              },
+              {
+                "type": "container",
+                "orientation": "vertical",
+                "content_alignment_horizontal": "center",
+                "items": [
+                  {
+                    "type": "image_block",
+                    "image_url": "https://habrastorage.org/r/w1560/webt/gb/os/k6/gbosk6103azqcls5anirre_tok8.jpeg"
+                  }
+                ]
+              },
+              {
+                "type": "subtitle",
+                "text": "Федя Игнаткевич рассказывает про свой опыт разработки DI-фреймворка. Попробуем разобраться, какие есть факторы замедления сборки, как Yatagan, совместимый с Dagger по API, с ними справляется и какие ещё задачи могут стоять перед DI-фреймворком."
+              },
+              {
+                "type": "action_button",
+                "text": "Читать на Хабре",
+                "actions": [
+                  {
+                    "log_id": "open_url_2",
+                    "url": "https://habr.com/ru/companies/yandex/articles/704838/"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "log_id": "youtube_interview",
+      "states": [
+        {
+          "state_id": 0,
+          "div": {
+            "type": "container",
+            "orientation": "vertical",
+            "margins": {
+              "top": 96
+            },
+            "items": [
+              {
+                "type": "title",
+                "text": "Mobile interview. Как делать браузер под iOS и управлять большой командой."
+              },
+              {
+                "type": "container",
+                "orientation": "vertical",
+                "content_alignment_horizontal": "center",
+                "items": [
+                  {
+                    "type": "image_block",
+                    "image_url": "https://storage.yandexcloud.net/storage-avasilov/pavel_vorobkalov_interview.jpeg"
+                  }
+                ]
+              },
+              {
+                "type": "subtitle",
+                "text": "В формате интерьвью обсудили, как руководителю завоевать авторитет в новой команде, легко ли переключаться между платформами, зачем использовать Chromium для iOS-браузера, можно ли делать его без WKWebView, какие сложности создаёт зависимость от Chromium и как измерить Mobile Velocity Index."
+              },
+              {
+                "type": "action_button",
+                "text": "Смотреть на YouTube",
+                "actions": [
+                  {
+                    "log_id": "open_url_3",
+                    "url": "https://www.youtube.com/watch?v=W6-sMP1sWjo&t=523s&ab_channel=YandexforMobile"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "log_id": "habr_tv",
+      "states": [
+        {
+          "state_id": 0,
+          "div": {
+            "type": "container",
+            "orientation": "vertical",
+            "margins": {
+              "top": 96
+            },
+            "items": [
+              {
+                "type": "title",
+                "text": "Из микро в макро: как адаптировать мобильное приложение под ТВ-платформу"
+              },
+              {
+                "type": "container",
+                "orientation": "vertical",
+                "content_alignment_horizontal": "center",
+                "items": [
+                  {
+                    "type": "image_block",
+                    "image_url": "https://habrastorage.org/r/w1560/getpro/habr/upload_files/048/4d4/dc6/0484d4dc6c1e587226395c1f0b75de5b.png"
+                  }
+                ]
+              },
+              {
+                "type": "subtitle",
+                "text": "Статья посвящена истории создания браузера для ТВ и трудностям, с которыми столкнулись наши разработчики приложений для Android-устройств. Рассказ будет интересен разработчикам, которые хотели бы адаптировать свой софт для телевизионной платформы, и просто любителям историй обхода всевозможных граблей. "
+              },
+              {
+                "type": "action_button",
+                "text": "Читать на Хабре",
+                "actions": [
+                  {
+                    "log_id": "open_url_4",
+                    "url": "https://habr.com/ru/companies/yandex/articles/765082/"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "log_id": "habr_build",
+      "states": [
+        {
+          "state_id": 0,
+          "div": {
+            "type": "container",
+            "orientation": "vertical",
+            "margins": {
+              "top": 96
+            },
+            "items": [
+              {
+                "type": "title",
+                "text": "Как мы ускоряли сборку Android-приложения из двух миллионов строк кода"
+              },
+              {
+                "type": "container",
+                "orientation": "vertical",
+                "content_alignment_horizontal": "center",
+                "items": [
+                  {
+                    "type": "image_block",
+                    "image_url": "https://habrastorage.org/r/w1560/webt/kz/ml/u7/kzmlu7lcmn0k9v7aypwiu-3r03q.jpeg"
+                  }
+                ]
+              },
+              {
+                "type": "subtitle",
+                "text": "Наверняка каждый Android-разработчик хоть раз сталкивался с проблемой скорости сборки своего проекта. К счастью за годы развития и в Gradle, и Android Gradle Plugin (AGP) появилось много полезных штук для ускорения сборки, которые можно применить без больших болей и огромных рефакторингов."
+              },
+              {
+                "type": "action_button",
+                "text": "Читать на Хабре",
+                "actions": [
+                  {
+                    "log_id": "open_url_5",
+                    "url": "https://habr.com/ru/companies/yandex/articles/678786/"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
