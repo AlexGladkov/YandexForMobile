@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -76,7 +76,7 @@ fun App() {
 
         LazyVerticalGrid(
             modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
-            columns = GridCells.Adaptive(minSize = 180.dp),
+            columns = GridCells.Fixed(count = 2),
             contentPadding = PaddingValues(12.dp)
         ) {
             items(worlds) { world ->
@@ -99,13 +99,13 @@ fun App() {
 @Composable
 private fun WorldItemView(title: String, logo: DrawableResource, onItemClicked: () -> Unit) {
     Card(
-        modifier = Modifier.clickable { onItemClicked.invoke() }.padding(8.dp).size(180.dp),
+        modifier = Modifier.clickable { onItemClicked.invoke() }.padding(8.dp).height(180.dp).fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = 8.dp
     ) {
         Box(modifier = Modifier.fillMaxSize().background(Color.LightGray)) {
             Image(
-                modifier = Modifier.size(180.dp),
+                modifier = Modifier.height(180.dp).fillMaxWidth(),
                 contentScale = ContentScale.Crop,
                 painter = painterResource(logo),
                 contentDescription = title
