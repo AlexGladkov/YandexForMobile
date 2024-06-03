@@ -14,6 +14,7 @@ struct ComposeView: UIViewControllerRepresentable {
             openBrowserDivKit: showBrowserDivKitScreen,
             mapsConfig: CoreMapsConfig(
                 dotImage: UIImage(named: "map_dot")!,
+                touchAreaImage: UIImage(named: "map_touch_area")!,
                 log: log
             )
         )

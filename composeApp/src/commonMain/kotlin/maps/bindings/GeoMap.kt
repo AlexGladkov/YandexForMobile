@@ -32,8 +32,14 @@ expect interface GeoMapObjectCollection {
 
 expect abstract class GeoPlacemarkImage
 
-expect interface GeoPlacemark {
+expect interface GeoMapObject {
+    fun setDraggable(draggable: Boolean)
+    fun setDragListener(listener: GeoMapObjectDragListener?)
+    fun setVisible(visible: Boolean)
+}
+
+expect interface GeoPlacemark: GeoMapObject {
+    fun getGeometry(): MapkitPoint
     fun setGeometry(point: MapkitPoint)
     fun setIcon(image: GeoPlacemarkImage)
-    fun setVisible(visible: Boolean)
 }

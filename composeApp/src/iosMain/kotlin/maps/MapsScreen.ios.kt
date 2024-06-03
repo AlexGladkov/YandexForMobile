@@ -6,6 +6,11 @@ import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoPlacemarkImageImpl
 
 @Composable
-actual fun MapsConfig.dotConfig(): GeoPlacemarkImage {
+actual fun MapsConfig.dotImage(): GeoPlacemarkImage {
     return GeoPlacemarkImageImpl(dotImage)
+}
+
+@Composable
+actual fun MapsConfig.touchAreaImage(): GeoPlacemarkImage {
+    return GeoPlacemarkImageImpl(touchAreaImage)
 }

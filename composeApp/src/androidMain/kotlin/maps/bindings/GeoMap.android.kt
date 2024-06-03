@@ -5,6 +5,7 @@ import com.yandex.mapkit.ScreenPoint
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapWindow
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -68,6 +69,8 @@ actual class GeoMap(private val view: MapView) {
 actual fun makeGeoScreenPoint(x: Float, y: Float): GeoScreenPoint = ScreenPoint(x, y)
 
 actual typealias GeoMapObjectCollection = MapObjectCollection
+
+actual typealias GeoMapObject = MapObject
 
 actual typealias GeoPlacemark = PlacemarkMapObject
 

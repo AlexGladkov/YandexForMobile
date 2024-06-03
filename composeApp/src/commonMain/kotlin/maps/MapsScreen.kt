@@ -6,7 +6,6 @@ import MapsConfig
 import PlatformConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,17 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import di.Inject
 import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
-import maps.bindings.GeoCameraPosition
-import maps.bindings.GeoMapCameraListener
+import maps.bindings.GeoMapObject
 import maps.bindings.GeoMapObjectCollection
+import maps.bindings.GeoMapObjectDragListener
 import maps.bindings.GeoPlacemark
 import maps.bindings.GeoPlacemarkImage
-import maps.bindings.GeoUtils
-import maps.bindings.createMapkitPoint
+import maps.bindings.MapkitPoint
 import maps.bindings.makeGeoScreenPoint
 import maps.bindings.point
-import maps.bindings.withPoint
-import maps.data.Australia
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.kodein.di.instance
@@ -79,7 +74,10 @@ fun MapsScreenView() {
 }
 
 @Composable
-expect fun MapsConfig.dotConfig(): GeoPlacemarkImage
+expect fun MapsConfig.dotImage(): GeoPlacemarkImage
+
+@Composable
+expect fun MapsConfig.touchAreaImage(): GeoPlacemarkImage
 
 @Composable
 private fun MapLayout() {
@@ -89,55 +87,106 @@ private fun MapLayout() {
         Box {
             val viewState by viewModel.viewStates().collectAsState()
             var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
-            val placemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
+            var savedTouchAreaPlacemark by remember { mutableStateOf<GeoPlacemark?>(null) }
+            val contourPlacemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
 
-            Map(mapState) { (position, _) ->
-                val screen = viewState.screen as? MapsScreen.Fun.ActualFun ?: return@Map
+            fun savedCollection(): GeoMapObjectCollection {
+                return savedCollection
+                    ?: (mapState.map!!.addCollection().also { savedCollection = it })
+            }
 
-                val newCenter = position.point
+            fun touchAreaPlacemark(): GeoPlacemark {
+                return savedTouchAreaPlacemark
+                    ?: savedCollection().addPlacemark().also { savedTouchAreaPlacemark = it }
+            }
+
+            fun moveRelativeContour() {
+                val screen = viewState.screen as? MapsScreen.Fun.ActualFun ?: return
+                val newCenter = touchAreaPlacemark().getGeometry()
                 screen.contour.positions.forEachIndexed { index, relativePosition ->
                     val newCoordinate = DirectProblemSolver.solveDirectProblem(
                         newCenter,
                         relativePosition.courseRadians,
                         relativePosition.distanceMeters,
                     )
-                    placemarks[index].setGeometry(newCoordinate.cachePoint)
+                    contourPlacemarks[index].setGeometry(newCoordinate.cachePoint)
                 }
+            }
+
+            Map(mapState) {
+                moveRelativeContour()
             }
 
             val config by derivedStateOf {
                 Inject.di.instance<PlatformConfiguration>().mapsConfig()
             }
-            val image = config.dotConfig()
+            val image = config.dotImage()
+            val areaImage = config.touchAreaImage()
+
+            var savedDragListener by remember { mutableStateOf<GeoMapObjectDragListener?>(null) }
+
+            LaunchedEffect(Unit) {
+                val map = mapState.map ?: return@LaunchedEffect
+                touchAreaPlacemark().let { touchArea ->
+                    val listener = object : GeoMapObjectDragListener {
+                        override fun onMapObjectDragStart(mapObject: GeoMapObject) {
+                        }
+
+                        override fun onMapObjectDrag(mapObject: GeoMapObject, point: MapkitPoint) {
+                            moveRelativeContour()
+                        }
+
+                        override fun onMapObjectDragEnd(mapObject: GeoMapObject) {
+                        }
+
+                    }
+                    savedDragListener = listener
+                    with(touchArea) {
+                        setDragListener(listener)
+                        setDraggable(true)
+                        setGeometry(map.cameraPosition().point)
+                        setIcon(areaImage)
+                    }
+                }
+            }
 
             SideEffect {
-                val screen = viewState.screen
+                mapState.map ?: return@SideEffect
 
-                if (screen is MapsScreen.Fun.ExpectFun) {
-                    val map = mapState.map ?: return@SideEffect
-                    val collection =
-                        savedCollection ?: (map.addCollection().also { savedCollection = it })
+                when (val screen = viewState.screen) {
+                    is MapsScreen.Fun.ExpectFun -> {
+                        touchAreaPlacemark().setVisible(false)
+                        val collection = savedCollection()
+                        if (contourPlacemarks.size < screen.contour.points.size) {
+                            for (i in (0 until screen.contour.points.size - contourPlacemarks.size)) {
+                                contourPlacemarks += collection.addPlacemark().also { placemark ->
+                                    placemark.setIcon(image)
+                                }
+                            }
+                        }
+                        if (contourPlacemarks.size > screen.contour.points.size) {
+                            contourPlacemarks.takeLast(contourPlacemarks.size - screen.contour.points.size)
+                                .forEach { placemark ->
+                                    placemark.setVisible(false)
+                                }
+                        }
 
-                    if (placemarks.size < screen.contour.points.size) {
-                        for (i in (0 until screen.contour.points.size - placemarks.size)) {
-                            placemarks += collection.addPlacemark().also { placemark ->
-                                placemark.setIcon(image)
+                        screen.contour.points.forEachIndexed { index, point ->
+                            contourPlacemarks[index].apply {
+                                setGeometry(point.cachePoint)
+                                setVisible(true)
                             }
                         }
                     }
-                    if (placemarks.size > screen.contour.points.size) {
-                        placemarks.takeLast(placemarks.size - screen.contour.points.size)
-                            .forEach { placemark ->
-                                placemark.setVisible(false)
-                            }
-                    }
 
-                    screen.contour.points.forEachIndexed { index, point ->
-                        placemarks[index].apply {
-                            setGeometry(point.cachePoint)
+                    is MapsScreen.Fun.ActualFun -> {
+                        touchAreaPlacemark().run {
                             setVisible(true)
+                            setGeometry(screen.referencePoint.cachePoint)
                         }
                     }
+
+                    else -> {}
                 }
 
             }

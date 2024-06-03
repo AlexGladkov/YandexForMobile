@@ -7,6 +7,7 @@ import cocoapods.YandexMapsMobile.YMKCameraPosition
 import cocoapods.YandexMapsMobile.YMKCameraUpdateReason
 import cocoapods.YandexMapsMobile.YMKMap
 import cocoapods.YandexMapsMobile.YMKMapCameraListenerProtocol
+import cocoapods.YandexMapsMobile.YMKMapObject
 import cocoapods.YandexMapsMobile.YMKMapObjectCollection
 import cocoapods.YandexMapsMobile.YMKMapView
 import cocoapods.YandexMapsMobile.YMKMapWindow
@@ -149,10 +150,31 @@ class GeoMapObjectCollectionImpl(val impl: YMKMapObjectCollection) : GeoMapObjec
     override fun addPlacemark(): GeoPlacemark = GeoPlacemarkImpl(impl.addPlacemark())
 }
 
-actual interface GeoPlacemark {
+actual interface GeoMapObject {
+    actual fun setDraggable(draggable: Boolean)
+    actual fun setDragListener(listener: GeoMapObjectDragListener?)
+    actual fun setVisible(visible: Boolean)
+}
+
+open class GeoMapObjectImpl(private val impl: YMKMapObject) : GeoMapObject {
+
+    final override fun setDraggable(draggable: Boolean) {
+        impl.setDraggable(draggable)
+    }
+
+    final override fun setDragListener(listener: GeoMapObjectDragListener?) {
+        impl.setDragListenerWithDragListener(listener?.let(::MapObjectDragListenerWrapper))
+    }
+
+    final override fun setVisible(visible: Boolean) {
+        impl.setVisible(visible)
+    }
+}
+
+actual interface GeoPlacemark : GeoMapObject {
+    actual fun getGeometry(): MapkitPoint
     actual fun setGeometry(point: MapkitPoint)
     actual fun setIcon(image: GeoPlacemarkImage)
-    actual fun setVisible(visible: Boolean)
 }
 
 fun IntArray.toNSData(): NSData {
@@ -166,7 +188,10 @@ fun IntArray.toNSData(): NSData {
 }
 
 
-class GeoPlacemarkImpl(val impl: YMKPlacemarkMapObject) : GeoPlacemark {
+class GeoPlacemarkImpl(val impl: YMKPlacemarkMapObject) : GeoPlacemark, GeoMapObjectImpl(impl) {
+    override fun getGeometry(): MapkitPoint {
+        return impl.geometry()
+    }
 
     override fun setGeometry(point: MapkitPoint) {
         impl.setGeometry(point)
@@ -174,10 +199,6 @@ class GeoPlacemarkImpl(val impl: YMKPlacemarkMapObject) : GeoPlacemark {
 
     override fun setIcon(image: GeoPlacemarkImage) {
         impl.setIconWithImage(image.wrapped)
-    }
-
-    override fun setVisible(visible: Boolean) {
-        impl.setVisible(visible)
     }
 }
 
@@ -197,4 +218,11 @@ actual fun GeoCameraPosition.withPoint(point: MapkitPoint): GeoCameraPosition {
         azimuth,
         tilt,
     )
+}
+
+fun YMKMapObject.wrap(): GeoMapObject {
+    return when (this) {
+        is YMKPlacemarkMapObject -> GeoPlacemarkImpl(this)
+        else -> GeoMapObjectImpl(this)
+    }
 }
