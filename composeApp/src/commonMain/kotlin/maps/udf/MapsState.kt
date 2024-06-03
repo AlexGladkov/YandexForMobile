@@ -6,8 +6,14 @@ data class MapsState(val screen: MapScreen = MapScreen.ExpectFun())
 
 sealed interface MapScreen {
     data class ExpectFun(
+        val mode: Mode = Mode.DrawContour,
         val contour: EditableContour = EditableContour(),
-    ) : MapScreen
+    ) : MapScreen {
+        enum class Mode {
+            DragMap,
+            DrawContour,
+        }
+    }
 
     data class ActualFun(
         val referencePoint: Coordinates,
@@ -16,8 +22,18 @@ sealed interface MapScreen {
 }
 
 data class EditableContour(
-    val points: List<Coordinates> = emptyList(),
-)
+    val currentPart: List<Coordinates>? = null,
+    val parts: List<List<Coordinates>> = emptyList(),
+) {
+    val points by lazy {
+        val flattened = parts.flatten()
+        if (currentPart == null) {
+            flattened
+        } else {
+            flattened + currentPart
+        }
+    }
+}
 
 data class RelativeContour(
     val positions: List<RelativePosition>,

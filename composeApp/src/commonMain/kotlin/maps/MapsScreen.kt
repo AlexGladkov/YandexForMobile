@@ -5,7 +5,9 @@ package maps
 import MapsConfig
 import PlatformConfiguration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,7 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -27,8 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import di.Inject
@@ -44,15 +50,25 @@ import maps.bindings.compose.Map
 import maps.bindings.compose.MapState
 import maps.bindings.point
 import maps.udf.AddPoint
+import maps.udf.BeginEditContourPart
 import maps.udf.EditableContour
+import maps.udf.EndEditContourPart
+import maps.udf.SwitchToDragMap
+import maps.udf.SwitchToDrawContour
 import maps.udf.GoToActualFun
 import maps.udf.GoToExpectFun
 import maps.udf.MapScreen
+import maps.udf.MapsEvent
 import maps.udf.RelativeContour
+import maps.udf.RevertLastContourPart
 import maps.utils.DirectProblemSolver
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.vectorResource
 import org.kodein.di.instance
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
+import worlds.composeapp.generated.resources.Res
+import worlds.composeapp.generated.resources.map_control_button_drag
+import worlds.composeapp.generated.resources.map_control_button_draw
 
 
 @Composable
@@ -66,133 +82,202 @@ expect fun MapsConfig.dotImage(): GeoPlacemarkImage
 @Composable
 expect fun MapsConfig.touchAreaImage(): GeoPlacemarkImage
 
+class MapScreenMutableState(
+    val dotImage: GeoPlacemarkImage,
+    val areaImage: GeoPlacemarkImage,
+) {
+    val mapState by mutableStateOf(MapState())
+    var savedCollection by mutableStateOf<GeoMapObjectCollection?>(null)
+    var savedTouchAreaPlacemark by mutableStateOf<GeoPlacemark?>(null)
+    val config by derivedStateOf {
+        Inject.di.instance<PlatformConfiguration>().mapsConfig()
+    }
+
+    // We need to hold strong reference to listener because of WeakRefs in implementations
+    var touchAreaDragListener by mutableStateOf<GeoMapObjectDragListener?>(null)
+
+    val contourPlacemarks by mutableStateOf(mutableListOf<GeoPlacemark>())
+
+    fun touchAreaPlacemark(): GeoPlacemark {
+        return savedTouchAreaPlacemark
+            ?: savedCollection().addPlacemark().also { savedTouchAreaPlacemark = it }
+    }
+
+    fun savedCollection(): GeoMapObjectCollection {
+        return savedCollection
+            ?: (mapState.map!!.addCollection().also { savedCollection = it })
+    }
+
+    fun moveRelativeContourByTouchArea(contour: RelativeContour) {
+
+        moveRelativeContour(
+            touchAreaPlacemark().getGeometry(),
+            contour,
+            contourPlacemarks,
+            savedCollection(),
+            dotImage,
+        )
+    }
+}
+
+@Immutable
+private data class ImmutableConfig(val impl: MapsConfig)
+
 @Composable
 private fun MapFunScreen() {
-    val mapState by remember { mutableStateOf(MapState()) }
+    val config by derivedStateOf {
+        ImmutableConfig(Inject.di.instance<PlatformConfiguration>().mapsConfig())
+    }
+    val dotImage = config.impl.dotImage()
+    val touchAreaImage = config.impl.touchAreaImage()
+    val mapsScreenMutableState = remember {
+        MapScreenMutableState(
+            dotImage,
+            touchAreaImage,
+        )
+    }
 
     StoredViewModel(factory = { MapsViewModel() }) { viewModel ->
         Box {
             val viewState by viewModel.viewStates().collectAsState()
-            var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
-            var savedTouchAreaPlacemark by remember { mutableStateOf<GeoPlacemark?>(null) }
-            // We need to hold strong reference to listener because of WeakRefs in implementations
-            var touchAreaDragListener by remember {
-                mutableStateOf<GeoMapObjectDragListener?>(null)
-            }
-            val contourPlacemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
-            val config by derivedStateOf {
-                Inject.di.instance<PlatformConfiguration>().mapsConfig()
-            }
-            val dotImage = config.dotImage()
-            val areaImage = config.touchAreaImage()
+            Map(
+                state = mapsScreenMutableState.mapState,
+                onCameraMoved = {
+                    (viewState as? MapPlayWithMercatorViewState)?.run {
+                        mapsScreenMutableState.moveRelativeContourByTouchArea(contour)
+                    }
+                },
+            )
 
-            fun savedCollection(): GeoMapObjectCollection {
-                return savedCollection
-                    ?: (mapState.map!!.addCollection().also { savedCollection = it })
-            }
+            when (val vs = viewState) {
+                is MapPlayWithMercatorViewState -> PlayWithMercatorScreen(
+                    mapsScreenMutableState,
+                    viewState = vs,
+                    dispatch = { event -> viewModel.obtainEvent(event) },
+                )
 
-            fun touchAreaPlacemark(): GeoPlacemark {
-                return savedTouchAreaPlacemark
-                    ?: savedCollection().addPlacemark().also { savedTouchAreaPlacemark = it }
-            }
-
-            fun moveRelativeContour() {
-                val screen = viewState.screen as? MapScreen.ActualFun ?: return
-
-                moveRelativeContour(
-                    touchAreaPlacemark().getGeometry(),
-                    screen.contour,
-                    contourPlacemarks,
-                    savedCollection(),
-                    dotImage,
+                is MapEditContourViewState -> EditContourScreen(
+                    mapsScreenMutableState,
+                    viewState = vs,
+                    dispatch = { event -> viewModel.obtainEvent(event) },
                 )
             }
 
-            Map(
-                state = mapState,
-                onCameraMoved = { moveRelativeContour() },
-            )
-
-            LaunchedEffect(Unit) {
-                val map = mapState.map ?: return@LaunchedEffect
-                touchAreaPlacemark().let { touchArea ->
-                    val listener = DragsPositionsListener { moveRelativeContour() }
-                    touchAreaDragListener = listener
-                    with(touchArea) {
-                        setDragListener(listener)
-                        setDraggable(true)
-                        setGeometry(map.cameraPosition().point)
-                        setIcon(areaImage)
-                    }
-                }
-            }
-
-            SideEffect {
-                mapState.map ?: return@SideEffect
-
-                when (val screen = viewState.screen) {
-                    is MapScreen.ExpectFun -> {
-                        touchAreaPlacemark().setVisible(false)
-
-                        drawEditableContour(
-                            screen.contour,
-                            contourPlacemarks,
-                            savedCollection(),
-                            dotImage,
-                        )
-                    }
-
-                    is MapScreen.ActualFun -> {
-                        touchAreaPlacemark().run {
-                            setVisible(true)
-                            setGeometry(screen.referencePoint.cachePoint)
-                        }
-
-                        moveRelativeContour()
-                    }
-                }
-
-            }
-
-            if (!viewState.isMapDraggable) {
-                TouchInterceptorOverlay { event ->
-                    val position = event.changes.first().position
-
-                    mapState.screenToWorld(x = position.x, y = position.y)?.let {
-                        viewModel.obtainEvent(AddPoint(it))
-                    }
-                }
-            }
-
             CloseButton(Modifier.align(Alignment.BottomStart))
+        }
+    }
+}
 
+@Composable
+private fun PlayWithMercatorScreen(
+    mapsScreenState: MapScreenMutableState,
+    viewState: MapPlayWithMercatorViewState,
+    dispatch: (MapsEvent) -> Unit,
+) = Box(modifier = Modifier.fillMaxSize()) {
+
+    MapControlButton(
+        icon = Icons.Default.Edit,
+        onClick = { dispatch(GoToExpectFun()) },
+        modifier = Modifier.align(Alignment.BottomEnd),
+    )
+
+    LaunchedEffect(Unit) {
+        mapsScreenState.touchAreaPlacemark().let { touchArea ->
+            val listener = DragsPositionsListener {
+                mapsScreenState.moveRelativeContourByTouchArea(viewState.contour)
+            }
+            mapsScreenState.touchAreaDragListener = listener
+            with(touchArea) {
+                setDragListener(listener)
+                setDraggable(true)
+                setIcon(mapsScreenState.areaImage)
+            }
+        }
+    }
+
+    SideEffect {
+        with(mapsScreenState) {
+            touchAreaPlacemark().run {
+                setVisible(true)
+                setGeometry(viewState.referencePoint.cachePoint)
+            }
+
+            mapsScreenState.moveRelativeContourByTouchArea(viewState.contour)
+        }
+    }
+}
+
+@Composable
+private fun EditContourScreen(
+    mapsScreenState: MapScreenMutableState,
+    viewState: MapEditContourViewState,
+    dispatch: (MapsEvent) -> Unit,
+) = Box(modifier = Modifier.fillMaxSize()) {
+
+    if (!viewState.isMapDraggable) {
+        TouchInterceptorOverlay(
+            onTouchEvent = touch@{ touchEvent ->
+                val position = touchEvent.changes.first().position
+                val worldPoint = mapsScreenState.mapState.screenToWorld(
+                    x = position.x,
+                    y = position.y,
+                ) ?: return@touch
+                val event = when (touchEvent.type) {
+                    PointerEventType.Press -> BeginEditContourPart(worldPoint)
+                    PointerEventType.Release -> EndEditContourPart
+                    PointerEventType.Move -> AddPoint(worldPoint)
+                    else -> return@touch
+                }
+                dispatch(event)
+            }
+        )
+    }
+
+    Column(Modifier.align(Alignment.BottomEnd)) {
+        if (viewState.showRevertButton) {
             MapControlButton(
-                if (viewState.isMapDraggable) {
-                    Icons.Default.Edit
-                } else {
-                    Icons.Default.Done
-                },
-                onClick = {
-                    val event = when (val screen = viewState.screen) {
-                        is MapScreen.ActualFun -> {
-                            GoToExpectFun()
-                        }
+                icon = Icons.Default.Refresh,
+                onClick = { dispatch(RevertLastContourPart) },
+            )
+        }
 
-                        is MapScreen.ExpectFun -> {
-                            val center = Coordinates(mapState.map!!.cameraPosition().point)
-                            GoToActualFun(center, screen.contour.points)
-                        }
-                    }
-                    viewModel.obtainEvent(event)
-                },
-                modifier = Modifier.align(Alignment.BottomEnd)
+        if (viewState.isMapDraggable) {
+            MapControlButton(
+                icon = vectorResource(Res.drawable.map_control_button_draw),
+                onClick = { dispatch(SwitchToDrawContour) },
+            )
+        } else {
+            MapControlButton(
+                icon = vectorResource(Res.drawable.map_control_button_drag),
+                onClick = { dispatch(SwitchToDragMap) },
+            )
+        }
+
+        MapControlButton(
+            icon = Icons.Default.Done,
+            onClick = {
+                val center = Coordinates(mapsScreenState.mapState.map!!.cameraPosition().point)
+                dispatch(GoToActualFun(center, viewState.contour.points))
+            },
+        )
+    }
+
+    SideEffect {
+        with(mapsScreenState) {
+            touchAreaPlacemark().setVisible(false)
+
+            drawEditableContour(
+                viewState.contour,
+                contourPlacemarks,
+                savedCollection(),
+                dotImage,
             )
         }
     }
 }
 
 @Composable
-fun CloseButton(modifier: Modifier = Modifier) {
+private fun CloseButton(modifier: Modifier = Modifier) {
     val rootController = LocalRootController.current
     MapControlButton(
         icon = Icons.Default.Close,
@@ -204,7 +289,7 @@ fun CloseButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
+private fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
     modifier = Modifier.fillMaxWidth().fillMaxHeight()
         .pointerInput(Unit) {
             awaitPointerEventScope {
@@ -219,7 +304,7 @@ fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
 }
 
 @Composable
-fun MapControlButton(
+private fun MapControlButton(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -227,12 +312,14 @@ fun MapControlButton(
     shape = CircleShape,
     onClick = onClick,
     modifier = modifier
-        .padding(horizontal = 16.dp, vertical = 24.dp)
+        .padding(bottom = 24.dp)
+        .padding(horizontal = 16.dp)
         .size(64.dp),
 ) {
     Icon(
         icon,
         contentDescription = null,
+        tint = Color(0xFF196DFF),
     )
 }
 
@@ -263,7 +350,6 @@ private fun moveRelativeContour(
         }.asIterable(),
         contourPlacemarks,
     )
-
 }
 
 private fun drawEditableContour(

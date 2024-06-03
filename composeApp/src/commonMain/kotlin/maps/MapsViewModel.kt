@@ -11,7 +11,7 @@ import maps.udf.Store
 import maps.udf.reduce
 
 class MapsViewModel private constructor(initialState: MapsState) :
-    BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(initialState.toViewState()) {
+    BaseSharedViewModel<MapViewState, Nothing, MapsEvent>(initialState.toViewState()) {
 
     constructor() : this(initialState = MapsState())
 
@@ -33,7 +33,11 @@ class MapsViewModel private constructor(initialState: MapsState) :
     }
 }
 
-private fun MapsState.toViewState() = MapsViewState(
-    isMapDraggable = screen is MapScreen.ActualFun,
-    screen = screen,
-)
+private fun MapsState.toViewState() = when (screen) {
+    is MapScreen.ActualFun -> MapPlayWithMercatorViewState(screen.referencePoint, screen.contour)
+    is MapScreen.ExpectFun -> MapEditContourViewState(
+        screen.contour,
+        isMapDraggable = screen.mode == MapScreen.ExpectFun.Mode.DragMap,
+        showRevertButton = screen.contour.parts.isNotEmpty(),
+    )
+}

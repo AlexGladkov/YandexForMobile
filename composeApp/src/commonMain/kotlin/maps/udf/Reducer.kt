@@ -44,14 +44,42 @@ private fun MapScreen.ExpectFun.reduceExpectFun(event: MapsEvent): MapScreen {
         }
 
         else -> copy(
+            mode = mode.reduce(event),
             contour = contour.reduce(event),
         )
     }
 }
 
+private fun MapScreen.ExpectFun.Mode.reduce(event: MapsEvent): MapScreen.ExpectFun.Mode {
+    return when (event) {
+        is SwitchToDrawContour -> MapScreen.ExpectFun.Mode.DrawContour
+        is SwitchToDragMap -> MapScreen.ExpectFun.Mode.DragMap
+        else -> this
+    }
+}
+
 private fun EditableContour.reduce(event: MapsEvent): EditableContour {
     return when (event) {
-        is AddPoint -> copy(points = points + event.point)
+        is BeginEditContourPart -> copy(
+            currentPart = listOf(event.point),
+            parts = currentPart?.let(parts::plusElement) ?: parts,
+        )
+
+        is EndEditContourPart -> copy(
+            currentPart = null,
+            parts = currentPart?.let(parts::plusElement) ?: parts,
+        )
+
+        is AddPoint -> copy(
+            currentPart = currentPart?.plusElement(event.point) ?: listOf(event.point),
+        )
+
+        is RevertLastContourPart -> when {
+            currentPart != null -> copy(currentPart = null)
+            parts.isNotEmpty() -> copy(parts = parts.dropLast(1))
+            else -> this
+        }
+
         else -> this
     }
 }
