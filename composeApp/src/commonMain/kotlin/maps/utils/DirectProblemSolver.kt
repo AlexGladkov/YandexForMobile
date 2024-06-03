@@ -1,4 +1,4 @@
-package maps
+package maps.utils
 
 import maps.bindings.Coordinates
 import maps.bindings.GeoPoint
@@ -14,12 +14,13 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
+// Based on https://en.wikipedia.org/wiki/Vincenty%27s_formulae
 object DirectProblemSolver {
-    private const val a = 6378137.0 // экваториальный радиус
-    private const val e2 = 0.00669437999014 // эксцентриситет в квадрате
-    private val f = 1 - sqrt(1.0 - e2) // сжатие
-    private val b = (1 - f) * a // полярный радиус
-    private const val eps = 1e-10 // Точность вычислений
+    private const val a = 6378137.0
+    private const val e2 = 0.00669437999014
+    private val f = 1 - sqrt(1.0 - e2)
+    private val b = (1 - f) * a
+    private const val eps = 1e-10
 
     fun solveDirectProblem(
         startPoint: GeoPoint,
@@ -56,9 +57,11 @@ object DirectProblemSolver {
             var change: Double
 
             do {
-                val dsigma =
-                    B * sin(sigma) * (cos2sigmam + 0.25 * B * (cos(sigma) * (-1 + 2 * cos2sigmam * cos2sigmam) - 1.0 / 6.0 * B * cos2sigmam *
-                            (-3.0 + 4.0 * sin(sigma) * sin(sigma)) * (-3.0 + 4.0 * cos2sigmam * cos2sigmam)))
+                val dsigma = B * sin(sigma) *
+                        (cos2sigmam +
+                                0.25 * B * (cos(sigma) * (-1 + 2 * cos2sigmam * cos2sigmam) -
+                                1.0 / 6.0 * B * cos2sigmam * (-3.0 + 4.0 * sin(sigma) * sin(sigma))
+                                * (-3.0 + 4.0 * cos2sigmam * cos2sigmam)))
                 change = dsigma - prev
                 prev = dsigma
                 sigma = d / (b * A) + dsigma

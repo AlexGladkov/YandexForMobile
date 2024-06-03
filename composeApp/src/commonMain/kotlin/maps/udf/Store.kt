@@ -1,4 +1,4 @@
-package maps
+package maps.udf
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow

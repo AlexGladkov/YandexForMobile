@@ -1,4 +1,4 @@
-package maps
+package maps.bindings.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,6 +10,7 @@ import maps.bindings.CameraMove
 import maps.bindings.Coordinates
 import maps.bindings.GeoMap
 import maps.bindings.GeoScreenPoint
+import maps.bindings.makeGeoScreenPoint
 
 
 class MapState(val coordinates: Coordinates? = null) {
@@ -22,8 +23,8 @@ class MapState(val coordinates: Coordinates? = null) {
         )
     }
 
-    fun screenToWorld(screenPoint: GeoScreenPoint): Coordinates? {
-        return map?.screenToWorld(screenPoint)?.let(::Coordinates)
+    fun screenToWorld(x: Float, y: Float): Coordinates? {
+        return map?.screenToWorld(makeGeoScreenPoint(x = x, y = y))?.let(::Coordinates)
     }
 }
 

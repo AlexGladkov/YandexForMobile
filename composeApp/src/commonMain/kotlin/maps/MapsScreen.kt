@@ -4,29 +4,16 @@ package maps
 
 import MapsConfig
 import PlatformConfiguration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
@@ -40,38 +27,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import di.Inject
 import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
 import maps.bindings.Coordinates
-import maps.bindings.GeoMapObject
+import maps.bindings.DragsPositionsListener
 import maps.bindings.GeoMapObjectCollection
 import maps.bindings.GeoMapObjectDragListener
 import maps.bindings.GeoPlacemark
 import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoPoint
-import maps.bindings.makeGeoScreenPoint
+import maps.bindings.compose.Map
+import maps.bindings.compose.MapState
 import maps.bindings.point
+import maps.udf.AddPoint
+import maps.udf.EditableContour
+import maps.udf.GoToActualFun
+import maps.udf.GoToExpectFun
+import maps.udf.MapScreen
+import maps.udf.RelativeContour
+import maps.utils.DirectProblemSolver
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 import org.kodein.di.instance
-import worlds.composeapp.generated.resources.Res
-import worlds.composeapp.generated.resources.browser_background
+import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
-private val items = mapsItems()
 
 @Composable
-fun MapsScreenView() {
-
-    MapLayout()
-
-//    DefaultLayout()
+fun MapsScreen() {
+    MapFunScreen()
 }
 
 @Composable
@@ -81,7 +67,7 @@ expect fun MapsConfig.dotImage(): GeoPlacemarkImage
 expect fun MapsConfig.touchAreaImage(): GeoPlacemarkImage
 
 @Composable
-private fun MapLayout() {
+private fun MapFunScreen() {
     val mapState by remember { mutableStateOf(MapState()) }
 
     StoredViewModel(factory = { MapsViewModel() }) { viewModel ->
@@ -89,7 +75,16 @@ private fun MapLayout() {
             val viewState by viewModel.viewStates().collectAsState()
             var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
             var savedTouchAreaPlacemark by remember { mutableStateOf<GeoPlacemark?>(null) }
+            // We need to hold strong reference to listener because of WeakRefs in implementations
+            var touchAreaDragListener by remember {
+                mutableStateOf<GeoMapObjectDragListener?>(null)
+            }
             val contourPlacemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
+            val config by derivedStateOf {
+                Inject.di.instance<PlatformConfiguration>().mapsConfig()
+            }
+            val dotImage = config.dotImage()
+            val areaImage = config.touchAreaImage()
 
             fun savedCollection(): GeoMapObjectCollection {
                 return savedCollection
@@ -102,46 +97,27 @@ private fun MapLayout() {
             }
 
             fun moveRelativeContour() {
-                val screen = viewState.screen as? MapsScreen.Fun.ActualFun ?: return
-                val newCenter = touchAreaPlacemark().getGeometry()
-                screen.contour.positions.forEachIndexed { index, relativePosition ->
-                    val newCoordinate = DirectProblemSolver.solveDirectProblem(
-                        newCenter,
-                        relativePosition.courseRadians,
-                        relativePosition.distanceMeters,
-                    )
-                    contourPlacemarks[index].setGeometry(newCoordinate.cachePoint)
-                }
+                val screen = viewState.screen as? MapScreen.ActualFun ?: return
+
+                moveRelativeContour(
+                    touchAreaPlacemark().getGeometry(),
+                    screen.contour,
+                    contourPlacemarks,
+                    savedCollection(),
+                    dotImage,
+                )
             }
 
-            Map(mapState) {
-                moveRelativeContour()
-            }
-
-            val config by derivedStateOf {
-                Inject.di.instance<PlatformConfiguration>().mapsConfig()
-            }
-            val image = config.dotImage()
-            val areaImage = config.touchAreaImage()
-
-            var savedDragListener by remember { mutableStateOf<GeoMapObjectDragListener?>(null) }
+            Map(
+                state = mapState,
+                onCameraMoved = { moveRelativeContour() },
+            )
 
             LaunchedEffect(Unit) {
                 val map = mapState.map ?: return@LaunchedEffect
                 touchAreaPlacemark().let { touchArea ->
-                    val listener = object : GeoMapObjectDragListener {
-                        override fun onMapObjectDragStart(mapObject: GeoMapObject) {
-                        }
-
-                        override fun onMapObjectDrag(mapObject: GeoMapObject, point: GeoPoint) {
-                            moveRelativeContour()
-                        }
-
-                        override fun onMapObjectDragEnd(mapObject: GeoMapObject) {
-                        }
-
-                    }
-                    savedDragListener = listener
+                    val listener = DragsPositionsListener { moveRelativeContour() }
+                    touchAreaDragListener = listener
                     with(touchArea) {
                         setDragListener(listener)
                         setDraggable(true)
@@ -155,175 +131,199 @@ private fun MapLayout() {
                 mapState.map ?: return@SideEffect
 
                 when (val screen = viewState.screen) {
-                    is MapsScreen.Fun.ExpectFun -> {
+                    is MapScreen.ExpectFun -> {
                         touchAreaPlacemark().setVisible(false)
-                        val collection = savedCollection()
-                        if (contourPlacemarks.size < screen.contour.points.size) {
-                            for (i in (0 until screen.contour.points.size - contourPlacemarks.size)) {
-                                contourPlacemarks += collection.addPlacemark().also { placemark ->
-                                    placemark.setIcon(image)
-                                }
-                            }
-                        }
-                        if (contourPlacemarks.size > screen.contour.points.size) {
-                            contourPlacemarks.takeLast(contourPlacemarks.size - screen.contour.points.size)
-                                .forEach { placemark ->
-                                    placemark.setVisible(false)
-                                }
-                        }
 
-                        screen.contour.points.forEachIndexed { index, point ->
-                            contourPlacemarks[index].apply {
-                                setGeometry(point.cachePoint)
-                                setVisible(true)
-                            }
-                        }
+                        drawEditableContour(
+                            screen.contour,
+                            contourPlacemarks,
+                            savedCollection(),
+                            dotImage,
+                        )
                     }
 
-                    is MapsScreen.Fun.ActualFun -> {
+                    is MapScreen.ActualFun -> {
                         touchAreaPlacemark().run {
                             setVisible(true)
                             setGeometry(screen.referencePoint.cachePoint)
                         }
-                    }
 
-                    else -> {}
+                        moveRelativeContour()
+                    }
                 }
 
             }
 
             if (!viewState.isMapDraggable) {
-                Box(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight()
-                        .pointerInput(Unit) {
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent()
-                                    // handle pointer event
-                                    val position = event.changes.first().position
+                TouchInterceptorOverlay { event ->
+                    val position = event.changes.first().position
 
-                                    mapState.screenToWorld(
-                                        makeGeoScreenPoint(position.x, position.y)
-                                    )
-                                        ?.let(::AddPoint)
-                                        ?.let(viewModel::obtainEvent)
-                                }
-                            }
-                        }
-                ) {
-
+                    mapState.screenToWorld(x = position.x, y = position.y)?.let {
+                        viewModel.obtainEvent(AddPoint(it))
+                    }
                 }
             }
 
-            OutlinedButton(
-                shape = CircleShape,
+            CloseButton(Modifier.align(Alignment.BottomStart))
+
+            MapControlButton(
+                if (viewState.isMapDraggable) {
+                    Icons.Default.Edit
+                } else {
+                    Icons.Default.Done
+                },
                 onClick = {
                     val event = when (val screen = viewState.screen) {
-                        MapsScreen.Boring -> null
-                        is MapsScreen.Fun.ActualFun -> {
+                        is MapScreen.ActualFun -> {
                             GoToExpectFun()
                         }
 
-                        is MapsScreen.Fun.ExpectFun -> {
+                        is MapScreen.ExpectFun -> {
                             val center = Coordinates(mapState.map!!.cameraPosition().point)
                             GoToActualFun(center, screen.contour.points)
                         }
                     }
-                    event?.let(viewModel::obtainEvent)
+                    viewModel.obtainEvent(event)
                 },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
-                    .size(64.dp)
-                    .align(Alignment.BottomEnd),
-            ) {
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
+        }
+    }
+}
 
-                val icon = if (viewState.isMapDraggable) {
-                    Icons.Default.Edit
-                } else {
-                    Icons.Default.Done
+@Composable
+fun CloseButton(modifier: Modifier = Modifier) {
+    val rootController = LocalRootController.current
+    MapControlButton(
+        icon = Icons.Default.Close,
+        onClick = {
+            rootController.popBackStack()
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
+    modifier = Modifier.fillMaxWidth().fillMaxHeight()
+        .pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent()
+                    onTouchEvent(event)
                 }
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    modifier = Modifier,
-                )
             }
+        }
+) {
 
+}
+
+@Composable
+fun MapControlButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) = OutlinedButton(
+    shape = CircleShape,
+    onClick = onClick,
+    modifier = modifier
+        .padding(horizontal = 16.dp, vertical = 24.dp)
+        .size(64.dp),
+) {
+    Icon(
+        icon,
+        contentDescription = null,
+    )
+}
+
+private fun moveRelativeContour(
+    newCenter: GeoPoint,
+    contour: RelativeContour,
+    contourPlacemarks: MutableList<GeoPlacemark>,
+    parent: GeoMapObjectCollection,
+    dotImage: GeoPlacemarkImage,
+) {
+    ensurePlacemarksCountAtLeast(
+        count = contour.positions.size,
+        placemarks = contourPlacemarks,
+        parent = parent,
+        image = dotImage,
+    )
+    ensurePlacemarksVisibility(
+        usedCount = contour.positions.size,
+        placemarks = contourPlacemarks,
+    )
+    movePlacemarksUnsafe(
+        contour.positions.asSequence().map { relativePosition ->
+            DirectProblemSolver.solveDirectProblem(
+                newCenter,
+                relativePosition.courseRadians,
+                relativePosition.distanceMeters,
+            )
+        }.asIterable(),
+        contourPlacemarks,
+    )
+
+}
+
+private fun drawEditableContour(
+    contour: EditableContour,
+    contourPlacemarks: MutableList<GeoPlacemark>,
+    parent: GeoMapObjectCollection,
+    dotImage: GeoPlacemarkImage,
+) {
+    ensurePlacemarksCountAtLeast(
+        count = contour.points.size,
+        placemarks = contourPlacemarks,
+        parent = parent,
+        image = dotImage,
+    )
+
+    ensurePlacemarksVisibility(
+        usedCount = contour.points.size,
+        placemarks = contourPlacemarks,
+    )
+
+    movePlacemarksUnsafe(
+        points = contour.points,
+        placemarks = contourPlacemarks,
+    )
+}
+
+private fun ensurePlacemarksCountAtLeast(
+    count: Int,
+    placemarks: MutableList<GeoPlacemark>,
+    parent: GeoMapObjectCollection,
+    image: GeoPlacemarkImage,
+) {
+    if (placemarks.size < count) {
+        for (i in (0 until count - placemarks.size)) {
+            placemarks += parent.addPlacemark().also { placemark ->
+                placemark.setIcon(image)
+            }
         }
     }
 }
 
-@Composable
-private fun DefaultLayout() {
-    Box(
-        modifier = Modifier
-            .background(Color(0x88EEEEEE))
-
-    ) {
-        Image(
-            painter = painterResource(Res.drawable.browser_background),
-            modifier = Modifier.fillMaxSize(),
-            contentDescription = "Background Image",
-            contentScale = ContentScale.Crop
-        )
-        Column(modifier = Modifier.padding(16.dp).windowInsetsPadding(WindowInsets.systemBars)) {
-            Text(text = "Яндекс Карты", fontSize = 28.sp, fontWeight = FontWeight.Medium)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Яндекс Карты – одно из крупнейших приложений Яндекса, " +
-                        "гео-суперапп, позволяющий пользователям использовать сценарии навигации " +
-                        "на различных видах транспорта, искать места(организации, достопримечательности). ",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(2),
-                verticalItemSpacing = 16.dp,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                content = {
-
-                    items(items.size) { index ->
-                        AppItem(items[index])
-                    }
-                },
-                modifier = Modifier.fillMaxSize()
-            )
+private fun ensurePlacemarksVisibility(
+    usedCount: Int,
+    placemarks: List<GeoPlacemark>,
+) {
+    placemarks.take(usedCount).forEach { placemark ->
+        placemark.setVisible(true)
+    }
+    if (placemarks.size > usedCount) {
+        placemarks.takeLast(placemarks.size - usedCount).forEach { placemark ->
+            placemark.setVisible(false)
         }
     }
 }
 
-
-@Composable
-private fun AppItem(item: MapsItem) {
-
-    Box(
-        modifier = Modifier
-            .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .height(200.dp)
-            .background(item.backgroundColor),
-        contentAlignment = Alignment.TopStart
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            Image(
-                painter = painterResource(item.icon),
-                modifier = Modifier.size(item.iconSize.dp),
-                contentDescription = "Иконка для ${item.title}",
-                contentScale = ContentScale.Crop
-            )
-        }
-        Text(
-            text = item.title,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(start = 10.dp, top = 12.dp)
-        )
+private fun movePlacemarksUnsafe(
+    points: Iterable<Coordinates>,
+    placemarks: List<GeoPlacemark>,
+) {
+    points.forEachIndexed { index, point ->
+        placemarks[index].setGeometry(point.cachePoint)
     }
 }

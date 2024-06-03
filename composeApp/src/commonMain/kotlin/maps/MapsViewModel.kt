@@ -4,19 +4,23 @@ import io.github.alexgladkov.kviewmodel.BaseSharedViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import maps.udf.MapScreen
+import maps.udf.MapsEvent
+import maps.udf.MapsState
+import maps.udf.Store
+import maps.udf.reduce
 
-class MapsViewModel : BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(MapsViewState()) {
-    private val store = Store(MapsState(), ::reduce)
+class MapsViewModel private constructor(initialState: MapsState) :
+    BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(initialState.toViewState()) {
+
+    constructor() : this(initialState = MapsState())
+
+    private val store = Store(initialState, ::reduce)
 
     init {
         withViewModelScope {
             store.states()
-                .map { state ->
-                    MapsViewState(
-                        isMapDraggable = state.screen is MapsScreen.Fun.ActualFun,
-                        screen = state.screen,
-                    )
-                }
+                .map { state -> state.toViewState() }
                 .onEach { viewState = it }
                 .launchIn(this)
         }
@@ -28,3 +32,8 @@ class MapsViewModel : BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(Map
         }
     }
 }
+
+private fun MapsState.toViewState() = MapsViewState(
+    isMapDraggable = screen is MapScreen.ActualFun,
+    screen = screen,
+)

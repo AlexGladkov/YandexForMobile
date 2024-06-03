@@ -1,7 +1,9 @@
 package maps
 
+import maps.udf.MapScreen
+
 
 data class MapsViewState(
-    val isMapDraggable: Boolean = true,
-    val screen: MapsScreen = MapsScreen.Fun.ExpectFun(),
+    val isMapDraggable: Boolean,
+    val screen: MapScreen,
 )

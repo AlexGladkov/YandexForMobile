@@ -1,4 +1,4 @@
-package maps
+package maps.udf
 
 import maps.bindings.Coordinates
 
@@ -8,6 +8,7 @@ class AddPoint(val point: Coordinates): MapsEvent
 
 class UpdateReferencePoint(val point: Coordinates): MapsEvent
 
-class GoToActualFun(val currentMapCenter: Coordinates, val contourPoints: List<Coordinates>): MapsEvent
+class GoToActualFun(val currentMapCenter: Coordinates, val contourPoints: List<Coordinates>):
+    MapsEvent
 
 class GoToExpectFun: MapsEvent
