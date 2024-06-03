@@ -1,19 +1,10 @@
 package maps.bindings
 
 import com.yandex.mapkit.Animation
-import com.yandex.mapkit.ScreenPoint
 import com.yandex.mapkit.map.CameraListener
-import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.map.MapObject
-import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapWindow
-import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
-import com.yandex.runtime.image.ImageProvider
-
-actual typealias GeoScreenPoint = ScreenPoint
-actual typealias GeoCameraPosition = CameraPosition
 
 actual class GeoMap(private val view: MapView) {
     private val listenersMap = mutableMapOf<GeoMapCameraListener, CameraListener>()
@@ -26,7 +17,7 @@ actual class GeoMap(private val view: MapView) {
         return view.mapWindow?.let(block)!!
     }
 
-    actual fun screenToWorld(screenPoint: GeoScreenPoint): MapkitPoint? {
+    actual fun screenToWorld(screenPoint: GeoScreenPoint): GeoPoint? {
         return withMapWindow { screenToWorld(screenPoint) }
     }
 
@@ -66,24 +57,4 @@ actual class GeoMap(private val view: MapView) {
     }
 }
 
-actual fun makeGeoScreenPoint(x: Float, y: Float): GeoScreenPoint = ScreenPoint(x, y)
 
-actual typealias GeoMapObjectCollection = MapObjectCollection
-
-actual typealias GeoMapObject = MapObject
-
-actual typealias GeoPlacemark = PlacemarkMapObject
-
-actual typealias GeoPlacemarkImage = ImageProvider
-
-actual val GeoCameraPosition.point: MapkitPoint
-    get() = target
-
-actual fun GeoCameraPosition.withPoint(point: MapkitPoint): GeoCameraPosition {
-    return CameraPosition(
-        point,
-        zoom,
-        azimuth,
-        tilt,
-    )
-}

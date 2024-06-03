@@ -54,7 +54,7 @@ import maps.bindings.GeoMapObjectCollection
 import maps.bindings.GeoMapObjectDragListener
 import maps.bindings.GeoPlacemark
 import maps.bindings.GeoPlacemarkImage
-import maps.bindings.MapkitPoint
+import maps.bindings.GeoPoint
 import maps.bindings.makeGeoScreenPoint
 import maps.bindings.point
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -132,7 +132,7 @@ private fun MapLayout() {
                         override fun onMapObjectDragStart(mapObject: GeoMapObject) {
                         }
 
-                        override fun onMapObjectDrag(mapObject: GeoMapObject, point: MapkitPoint) {
+                        override fun onMapObjectDrag(mapObject: GeoMapObject, point: GeoPoint) {
                             moveRelativeContour()
                         }
 
@@ -202,10 +202,7 @@ private fun MapLayout() {
                                     val position = event.changes.first().position
 
                                     mapState.screenToWorld(
-                                        makeGeoScreenPoint(
-                                            position.x,
-                                            position.y,
-                                        )
+                                        makeGeoScreenPoint(position.x, position.y)
                                     )
                                         ?.let(::AddPoint)
                                         ?.let(viewModel::obtainEvent)

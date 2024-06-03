@@ -12,6 +12,7 @@ import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import maps.bindings.CameraListenerLambdaWrapper
 import maps.bindings.GeoMap
 import maps.bindings.GeoMapCameraListener
 import maps.bindings.GeoPlacemarkImage
@@ -35,7 +36,7 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
             MapView(context).also { mapView ->
                 val map = GeoMap(mapView).also { state.map = it }
 
-                onCameraMoved?.let(::InternalCameraListenerWrapper)?.let { listener ->
+                onCameraMoved?.let(::CameraListenerLambdaWrapper)?.let { listener ->
                     savedCameraListener = listener
                     map.addCameraListener(listener)
                 }

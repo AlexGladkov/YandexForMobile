@@ -15,7 +15,7 @@ import kotlin.native.ref.WeakReference
 
 actual interface GeoMapObjectDragListener {
     actual fun onMapObjectDragStart(mapObject: GeoMapObject)
-    actual fun onMapObjectDrag(mapObject: GeoMapObject, point: MapkitPoint)
+    actual fun onMapObjectDrag(mapObject: GeoMapObject, point: GeoPoint)
     actual fun onMapObjectDragEnd(mapObject: GeoMapObject)
 }
 
@@ -38,12 +38,13 @@ class MapObjectDragListenerWrapper(
         impl.get()?.onMapObjectDragEnd(mapObject.wrap())
     }
 
-    internal companion object
+    internal companion object ForNativePtr
 }
 
 fun MapObjectDragListenerWrapper(impl: GeoMapObjectDragListener): MapObjectDragListenerWrapper {
+    @Suppress("RedundantCompanionReference")
     val pointerToCompanionObject =
-        interpretCPointer<COpaque>(MapObjectDragListenerWrapper.objcPtr())
+        interpretCPointer<COpaque>(MapObjectDragListenerWrapper.ForNativePtr.objcPtr())
     val value = autoreleasepool { objc_getAssociatedObject(impl, pointerToCompanionObject) }
 
     if (value != null) {

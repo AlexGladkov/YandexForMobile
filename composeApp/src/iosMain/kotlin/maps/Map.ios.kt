@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import cocoapods.YandexMapsMobile.YMKMapView
+import maps.bindings.CameraListenerLambdaWrapper
 import maps.bindings.GeoCameraPosition
 import maps.bindings.GeoMap
 import maps.bindings.GeoMapCameraListener
@@ -24,7 +25,7 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
 
             val map = GeoMap(mapView).also { state.map = it }
 
-            onCameraMoved?.let(::InternalCameraListenerWrapper)?.let { listener ->
+            onCameraMoved?.let(::CameraListenerLambdaWrapper)?.let { listener ->
                 savedCameraListener = listener
                 map.addCameraListener(listener)
             }
