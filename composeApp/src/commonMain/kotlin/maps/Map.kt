@@ -8,6 +8,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import maps.bindings.GeoCameraPosition
 import maps.bindings.GeoMap
+import maps.bindings.GeoMapCameraListener
 import maps.bindings.GeoScreenPoint
 import maps.bindings.MapkitPoint
 import maps.bindings.createMapkitPoint
@@ -69,3 +70,10 @@ inline fun rememberMapState(
 ): MapState = rememberSaveable(key = key, saver = MapState.Saver) {
     MapState().apply(init)
 }
+
+class InternalCameraListenerWrapper(private val onCameraMoved: ((CameraMove) -> Unit)): GeoMapCameraListener {
+     override fun onCameraPositionChanged(position: GeoCameraPosition, finished: Boolean) {
+         onCameraMoved(CameraMove(position, finished))
+     }
+ }
+

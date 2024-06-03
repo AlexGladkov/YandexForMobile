@@ -17,24 +17,15 @@ import platform.CoreGraphics.CGRectMake
 
 @Composable
 actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
-    var savedListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
+    var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
     UIKitView(
         factory = {
             val mapView = YMKMapView(CGRectMake(0.0, 0.0, 0.0, 0.0))
 
             val map = GeoMap(mapView).also { state.map = it }
 
-            if (onCameraMoved != null) {
-                val listener = object : GeoMapCameraListener {
-                    override fun onCameraPositionChanged(
-                        position: GeoCameraPosition,
-                        finished: Boolean
-                    ) {
-                        onCameraMoved(CameraMove(position, finished))
-                    }
-
-                }
-                savedListener = listener
+            onCameraMoved?.let(::InternalCameraListenerWrapper)?.let { listener ->
+                savedCameraListener = listener
                 map.addCameraListener(listener)
             }
 
@@ -42,5 +33,12 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
         },
         update = {},
         modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+        onRelease = {
+            savedCameraListener?.let { listener ->
+                state.map?.run { removeCameraListener(listener) }
+            }
+            savedCameraListener = null
+            state.map = null
+        }
     )
 }

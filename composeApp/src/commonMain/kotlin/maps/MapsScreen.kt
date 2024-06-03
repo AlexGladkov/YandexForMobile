@@ -87,9 +87,21 @@ private fun MapLayout() {
 
     StoredViewModel(factory = { MapsViewModel() }) { viewModel ->
         Box {
-            Map(mapState) {
-                if (it.finished) {
-                    println("wtf camera move $it")
+            val viewState by viewModel.viewStates().collectAsState()
+            var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
+            val placemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
+
+            Map(mapState) { (position, _) ->
+                val screen = viewState.screen as? MapsScreen.Fun.ActualFun ?: return@Map
+
+                val newCenter = position.point
+                screen.contour.positions.forEachIndexed { index, relativePosition ->
+                    val newCoordinate = DirectProblemSolver.solveDirectProblem(
+                        newCenter,
+                        relativePosition.courseRadians,
+                        relativePosition.distanceMeters,
+                    )
+                    placemarks[index].setGeometry(newCoordinate.cachePoint)
                 }
             }
 
@@ -97,61 +109,6 @@ private fun MapLayout() {
                 Inject.di.instance<PlatformConfiguration>().mapsConfig()
             }
             val image = config.dotConfig()
-            var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
-
-            var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
-            val placemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
-
-//            LaunchedEffect(Unit) {
-//                mapState.map?.let { map ->
-//                    val initialCenter = createMapkitPoint(
-//                        Australia.center.lat,
-//                        Australia.center.lon,
-//                    )
-//                    val relatives = GeoUtils.calculateRelativeContour(
-//                        Australia.center,
-//                        Australia.coordinates,
-//                    )
-//                    val placemarksCollection = map.addCollection()
-//
-//                    val placemarks = Australia.coordinates.map { position ->
-//                        placemarksCollection.addPlacemark().apply {
-//                            setGeometry(createMapkitPoint(position.lat, position.lon))
-//                            setIcon(image)
-//                        }
-//                    }
-//
-//                    map.moveCamera(map.cameraPosition().withPoint(point = initialCenter))
-//
-//                    val listener = object : GeoMapCameraListener {
-//                        override fun onCameraPositionChanged(
-//                            position: GeoCameraPosition,
-//                            finished: Boolean
-//                        ) {
-//                            val newCenter = position.point
-//                            relatives.positions.forEachIndexed { index, relativePosition ->
-//                                val newCoordinate = DirectProblemSolver.solveDirectProblem(
-//                                    newCenter,
-//                                    relativePosition.courseRadians,
-//                                    relativePosition.distanceMeters,
-//                                )
-//                                placemarks[index].setGeometry(
-//                                    createMapkitPoint(
-//                                        newCoordinate.lat,
-//                                        newCoordinate.lon,
-//                                    )
-//                                )
-//                            }
-//                        }
-//                    }
-//
-//                    savedCameraListener = listener
-//                    map.addCameraListener(listener)
-//
-//                } ?: config.log("wtf map not found")
-//            }
-
-            val viewState by viewModel.viewStates().collectAsState()
 
             SideEffect {
                 val screen = viewState.screen

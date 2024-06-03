@@ -13,6 +13,7 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import maps.bindings.GeoMap
+import maps.bindings.GeoMapCameraListener
 import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoUtils
 import maps.data.Australia
@@ -28,30 +29,23 @@ data class PlacemarkData(
 
 @Composable
 actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
-    var savedCameraListener by remember { mutableStateOf<CameraListener?>(null) }
+    var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
     AndroidView(
         factory = { context ->
             MapView(context).also { mapView ->
-                if (onCameraMoved != null) {
-                    val map = GeoMap(mapView).also { state.map = it }
-                    
-                    savedCameraListener = listener
-                    mapView.mapWindow.map.addCameraListener(listener)
+                val map = GeoMap(mapView).also { state.map = it }
 
-                    mapView.mapWindow.map.move(
-                        MapkitCameraPosition(
-                            initialCenter,
-                            Australia.zoom,
-                            0f,
-                            0f,
-                        )
-                    )
+                onCameraMoved?.let(::InternalCameraListenerWrapper)?.let { listener ->
+                    savedCameraListener = listener
+                    map.addCameraListener(listener)
                 }
             }
         },
         update = {},
         onRelease = {
-            savedCameraListener?.let(it.mapWindow.map::removeCameraListener)
+            savedCameraListener?.let { listener ->
+                state.map?.run { removeCameraListener(listener) }
+            }
             savedCameraListener = null
             state.map = null
         }
