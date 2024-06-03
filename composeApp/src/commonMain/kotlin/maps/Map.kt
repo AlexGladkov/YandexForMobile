@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import maps.bindings.GeoCameraPosition
 import maps.bindings.GeoMap
 import maps.bindings.GeoScreenPoint
 import maps.bindings.MapkitPoint
@@ -13,21 +14,30 @@ import maps.bindings.createMapkitPoint
 import maps.bindings.lat
 import maps.bindings.lon
 
-data class Coordinates(val cachePoint: MapkitPoint) {
+class Coordinates(val cachePoint: MapkitPoint) {
     constructor(lat: Double, lon: Double) : this(createMapkitPoint(lat = lat, lon = lon))
 
     val lat by cachePoint::lat
     val lon by cachePoint::lon
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Coordinates) return false
+
+        return other.lat == lat && other.lon == lon
+    }
+
+    override fun hashCode(): Int {
+        return lat.hash() * 31 + lon.hash()
+    }
+
+    private fun Double.hash(): Int {
+        val bits = toBits()
+        return (bits shr 32).toInt() xor bits.toInt()
+    }
 }
 
-data class CameraPosition(
-    val center: Coordinates,
-    val zoom: Float,
-    val azimuth: Float,
-)
-
 data class CameraMove(
-    val position: CameraPosition,
+    val position: GeoCameraPosition,
     val finished: Boolean
 )
 

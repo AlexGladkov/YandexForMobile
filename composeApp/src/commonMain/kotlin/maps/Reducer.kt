@@ -1,5 +1,7 @@
 package maps
 
+import maps.bindings.GeoUtils
+
 fun reduce(state: MapsState, event: MapsEvent): MapsState {
     return with(state) {
         state.copy(
@@ -28,10 +30,16 @@ private fun MapsScreen.Boring.reduceBoring(event: MapsEvent): MapsScreen = this
 
 private fun MapsScreen.Fun.ExpectFun.reduceExpectFun(event: MapsEvent): MapsScreen {
     return when (event) {
-        is GoToActualFun -> MapsScreen.Fun.ActualFun(
-            referencePoint = event.currentMapCenter,
-            contour = event.contour,
-        )
+        is GoToActualFun -> {
+            val contour = GeoUtils.calculateRelativeContour(
+                event.currentMapCenter,
+                event.contourPoints,
+            )
+            MapsScreen.Fun.ActualFun(
+                referencePoint = event.currentMapCenter,
+                contour = contour,
+            )
+        }
 
         else -> copy(
             contour = contour.reduce(event),

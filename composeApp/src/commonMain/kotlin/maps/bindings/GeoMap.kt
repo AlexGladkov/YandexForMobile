@@ -35,4 +35,5 @@ expect abstract class GeoPlacemarkImage
 expect interface GeoPlacemark {
     fun setGeometry(point: MapkitPoint)
     fun setIcon(image: GeoPlacemarkImage)
+    fun setVisible(visible: Boolean)
 }

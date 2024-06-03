@@ -6,6 +6,7 @@ import MapsConfig
 import PlatformConfiguration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +22,19 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,18 +44,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import di.Inject
+import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
 import maps.bindings.GeoCameraPosition
 import maps.bindings.GeoMapCameraListener
+import maps.bindings.GeoMapObjectCollection
+import maps.bindings.GeoPlacemark
 import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoUtils
-import maps.bindings.withPoint
 import maps.bindings.createMapkitPoint
+import maps.bindings.makeGeoScreenPoint
 import maps.bindings.point
+import maps.bindings.withPoint
 import maps.data.Australia
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -70,83 +85,167 @@ expect fun MapsConfig.dotConfig(): GeoPlacemarkImage
 private fun MapLayout() {
     val mapState by remember { mutableStateOf(MapState()) }
 
-    Box {
-
-        Map(mapState) {
-            if (it.finished) {
-                println("wtf camera move $it")
-            }
-        }
-
-        val config by derivedStateOf { Inject.di.instance<PlatformConfiguration>().mapsConfig() }
-        val image = config.dotConfig()
-        var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
-
-        LaunchedEffect(Unit) {
-            mapState.map?.let { map ->
-                val initialCenter = createMapkitPoint(
-                    Australia.center.lat,
-                    Australia.center.lon,
-                )
-                val relatives = GeoUtils.calculateRelativeContour(
-                    Australia.center,
-                    Australia.coordinates,
-                )
-                val placemarksCollection = map.addCollection()
-
-                val placemarks = Australia.coordinates.map { position ->
-                    placemarksCollection.addPlacemark().apply {
-                        setGeometry(createMapkitPoint(position.lat, position.lon))
-                        setIcon(image)
-                    }
+    StoredViewModel(factory = { MapsViewModel() }) { viewModel ->
+        Box {
+            Map(mapState) {
+                if (it.finished) {
+                    println("wtf camera move $it")
                 }
+            }
 
-                map.moveCamera(map.cameraPosition().withPoint(point = initialCenter))
+            val config by derivedStateOf {
+                Inject.di.instance<PlatformConfiguration>().mapsConfig()
+            }
+            val image = config.dotConfig()
+            var savedCameraListener by remember { mutableStateOf<GeoMapCameraListener?>(null) }
 
-                val listener = object : GeoMapCameraListener {
-                    override fun onCameraPositionChanged(
-                        position: GeoCameraPosition,
-                        finished: Boolean
-                    ) {
-                        val newCenter = position.point
-                        relatives.positions.forEachIndexed { index, relativePosition ->
-                            val newCoordinate = DirectProblemSolver.solveDirectProblem(
-                                newCenter,
-                                relativePosition.courseRadians,
-                                relativePosition.distanceMeters,
-                            )
-                            placemarks[index].setGeometry(
-                                createMapkitPoint(
-                                    newCoordinate.lat,
-                                    newCoordinate.lon,
-                                )
-                            )
+            var savedCollection by remember { mutableStateOf<GeoMapObjectCollection?>(null) }
+            val placemarks by remember { mutableStateOf(mutableListOf<GeoPlacemark>()) }
+
+//            LaunchedEffect(Unit) {
+//                mapState.map?.let { map ->
+//                    val initialCenter = createMapkitPoint(
+//                        Australia.center.lat,
+//                        Australia.center.lon,
+//                    )
+//                    val relatives = GeoUtils.calculateRelativeContour(
+//                        Australia.center,
+//                        Australia.coordinates,
+//                    )
+//                    val placemarksCollection = map.addCollection()
+//
+//                    val placemarks = Australia.coordinates.map { position ->
+//                        placemarksCollection.addPlacemark().apply {
+//                            setGeometry(createMapkitPoint(position.lat, position.lon))
+//                            setIcon(image)
+//                        }
+//                    }
+//
+//                    map.moveCamera(map.cameraPosition().withPoint(point = initialCenter))
+//
+//                    val listener = object : GeoMapCameraListener {
+//                        override fun onCameraPositionChanged(
+//                            position: GeoCameraPosition,
+//                            finished: Boolean
+//                        ) {
+//                            val newCenter = position.point
+//                            relatives.positions.forEachIndexed { index, relativePosition ->
+//                                val newCoordinate = DirectProblemSolver.solveDirectProblem(
+//                                    newCenter,
+//                                    relativePosition.courseRadians,
+//                                    relativePosition.distanceMeters,
+//                                )
+//                                placemarks[index].setGeometry(
+//                                    createMapkitPoint(
+//                                        newCoordinate.lat,
+//                                        newCoordinate.lon,
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//
+//                    savedCameraListener = listener
+//                    map.addCameraListener(listener)
+//
+//                } ?: config.log("wtf map not found")
+//            }
+
+            val viewState by viewModel.viewStates().collectAsState()
+
+            SideEffect {
+                val screen = viewState.screen
+
+                if (screen is MapsScreen.Fun.ExpectFun) {
+                    val map = mapState.map ?: return@SideEffect
+                    val collection =
+                        savedCollection ?: (map.addCollection().also { savedCollection = it })
+
+                    if (placemarks.size < screen.contour.points.size) {
+                        for (i in (0 until screen.contour.points.size - placemarks.size)) {
+                            placemarks += collection.addPlacemark().also { placemark ->
+                                placemark.setIcon(image)
+                            }
+                        }
+                    }
+                    if (placemarks.size > screen.contour.points.size) {
+                        placemarks.takeLast(placemarks.size - screen.contour.points.size)
+                            .forEach { placemark ->
+                                placemark.setVisible(false)
+                            }
+                    }
+
+                    screen.contour.points.forEachIndexed { index, point ->
+                        placemarks[index].apply {
+                            setGeometry(point.cachePoint)
+                            setVisible(true)
                         }
                     }
                 }
 
-                savedCameraListener = listener
-                map.addCameraListener(listener)
+            }
 
-            } ?: config.log("wtf map not found")
+            if (!viewState.isMapDraggable) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight()
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    // handle pointer event
+                                    val position = event.changes.first().position
+
+                                    mapState.screenToWorld(
+                                        makeGeoScreenPoint(
+                                            position.x,
+                                            position.y,
+                                        )
+                                    )
+                                        ?.let(::AddPoint)
+                                        ?.let(viewModel::obtainEvent)
+                                }
+                            }
+                        }
+                ) {
+
+                }
+            }
+
+            OutlinedButton(
+                shape = CircleShape,
+                onClick = {
+                    val event = when (val screen = viewState.screen) {
+                        MapsScreen.Boring -> null
+                        is MapsScreen.Fun.ActualFun -> {
+                            GoToExpectFun()
+                        }
+
+                        is MapsScreen.Fun.ExpectFun -> {
+                            val center = Coordinates(mapState.map!!.cameraPosition().point)
+                            GoToActualFun(center, screen.contour.points)
+                        }
+                    }
+                    event?.let(viewModel::obtainEvent)
+                },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                    .size(64.dp)
+                    .align(Alignment.BottomEnd),
+            ) {
+
+                val icon = if (viewState.isMapDraggable) {
+                    Icons.Default.Edit
+                } else {
+                    Icons.Default.Done
+                }
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier,
+                )
+            }
+
         }
-        Box(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight()
-//                .pointerInput(Unit) {
-//                    awaitPointerEventScope {
-//                        while (true) {
-//                            val event = awaitPointerEvent()
-//                            // handle pointer event
-//                            val position = event.changes.first().position
-//                            val world = mapState.screenToWorld(ScreenPoint(position.x, position.y))
-//                            println("wtf $world")
-//                        }
-//                    }
-//                }
-        ) {
-
-        }
-
     }
 }
 

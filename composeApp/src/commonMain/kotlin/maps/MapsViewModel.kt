@@ -11,13 +11,20 @@ class MapsViewModel : BaseSharedViewModel<MapsViewState, Nothing, MapsEvent>(Map
     init {
         withViewModelScope {
             store.states()
-                .map { MapsViewState() } //TODO
+                .map { state ->
+                    MapsViewState(
+                        isMapDraggable = state.screen is MapsScreen.Fun.ActualFun,
+                        screen = state.screen,
+                    )
+                }
                 .onEach { viewState = it }
                 .launchIn(this)
         }
     }
 
     override fun obtainEvent(viewEvent: MapsEvent) {
-
+        withViewModelScope {
+            store.dispatch(viewEvent)
+        }
     }
 }

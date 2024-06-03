@@ -1,6 +1,6 @@
 package maps
 
-data class MapsState(val screen: MapsScreen = MapsScreen.Boring)
+data class MapsState(val screen: MapsScreen = MapsScreen.Fun.ExpectFun())
 
 sealed interface MapsScreen {
     data object Boring : MapsScreen
@@ -23,11 +23,7 @@ data class EditableContour(
 
 data class RelativeContour(
     val positions: List<RelativePosition>,
-) {
-    init {
-        require(positions.isNotEmpty())
-    }
-}
+)
 
 data class RelativePosition(
     val courseRadians: Double,

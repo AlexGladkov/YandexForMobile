@@ -152,6 +152,7 @@ class GeoMapObjectCollectionImpl(val impl: YMKMapObjectCollection) : GeoMapObjec
 actual interface GeoPlacemark {
     actual fun setGeometry(point: MapkitPoint)
     actual fun setIcon(image: GeoPlacemarkImage)
+    actual fun setVisible(visible: Boolean)
 }
 
 fun IntArray.toNSData(): NSData {
@@ -173,6 +174,10 @@ class GeoPlacemarkImpl(val impl: YMKPlacemarkMapObject) : GeoPlacemark {
 
     override fun setIcon(image: GeoPlacemarkImage) {
         impl.setIconWithImage(image.wrapped)
+    }
+
+    override fun setVisible(visible: Boolean) {
+        impl.setVisible(visible)
     }
 }
 

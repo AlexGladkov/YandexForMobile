@@ -13,12 +13,18 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import maps.bindings.GeoMap
+import maps.bindings.GeoPlacemarkImage
 import maps.bindings.GeoUtils
 import maps.data.Australia
 import org.jetbrains.compose.resources.imageResource
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.map_dot
 import com.yandex.mapkit.map.CameraPosition as MapkitCameraPosition
+
+data class PlacemarkData(
+    val icon: GeoPlacemarkImage,
+    val position: Coordinates,
+)
 
 @Composable
 actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
@@ -28,20 +34,18 @@ actual fun Map(state: MapState, onCameraMoved: ((CameraMove) -> Unit)?) {
             MapView(context).also { mapView ->
                 if (onCameraMoved != null) {
                     val map = GeoMap(mapView).also { state.map = it }
+                    
+                    savedCameraListener = listener
+                    mapView.mapWindow.map.addCameraListener(listener)
 
-
-
-//                    savedCameraListener = listener
-//                    mapView.mapWindow.map.addCameraListener(listener)
-//
-//                    mapView.mapWindow.map.move(
-//                        MapkitCameraPosition(
-//                            initialCenter,
-//                            Australia.zoom,
-//                            0f,
-//                            0f,
-//                        )
-//                    )
+                    mapView.mapWindow.map.move(
+                        MapkitCameraPosition(
+                            initialCenter,
+                            Australia.zoom,
+                            0f,
+                            0f,
+                        )
+                    )
                 }
             }
         },
