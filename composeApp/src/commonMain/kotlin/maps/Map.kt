@@ -6,40 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import maps.bindings.GeoCameraPosition
+import maps.bindings.CameraMove
+import maps.bindings.Coordinates
 import maps.bindings.GeoMap
 import maps.bindings.GeoScreenPoint
-import maps.bindings.GeoPoint
-import maps.bindings.makeGeoPoint
-import maps.bindings.lat
-import maps.bindings.lon
 
-class Coordinates(val cachePoint: GeoPoint) {
-    constructor(lat: Double, lon: Double) : this(makeGeoPoint(lat = lat, lon = lon))
-
-    val lat by cachePoint::lat
-    val lon by cachePoint::lon
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is Coordinates) return false
-
-        return other.lat == lat && other.lon == lon
-    }
-
-    override fun hashCode(): Int {
-        return lat.hash() * 31 + lon.hash()
-    }
-
-    private fun Double.hash(): Int {
-        val bits = toBits()
-        return (bits shr 32).toInt() xor bits.toInt()
-    }
-}
-
-data class CameraMove(
-    val position: GeoCameraPosition,
-    val finished: Boolean
-)
 
 class MapState(val coordinates: Coordinates? = null) {
     var map by mutableStateOf<GeoMap?>(null)

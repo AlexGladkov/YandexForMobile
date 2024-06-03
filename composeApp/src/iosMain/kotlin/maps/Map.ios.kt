@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import cocoapods.YandexMapsMobile.YMKMapView
 import maps.bindings.CameraListenerLambdaWrapper
-import maps.bindings.GeoCameraPosition
+import maps.bindings.CameraMove
 import maps.bindings.GeoMap
 import maps.bindings.GeoMapCameraListener
 import platform.CoreGraphics.CGRectMake

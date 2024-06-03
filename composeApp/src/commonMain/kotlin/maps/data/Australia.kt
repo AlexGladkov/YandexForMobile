@@ -1,6 +1,6 @@
 package maps.data
 
-import maps.Coordinates
+import maps.bindings.Coordinates
 
 object Australia {
     val center = Coordinates(lat = -23.837919330003736, lon = 132.4614317803961)

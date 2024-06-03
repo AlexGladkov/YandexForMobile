@@ -1,5 +1,6 @@
 package maps
 
+import maps.bindings.Coordinates
 import maps.bindings.GeoUtils
 import kotlin.math.PI
 

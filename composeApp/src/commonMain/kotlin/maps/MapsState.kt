@@ -1,5 +1,7 @@
 package maps
 
+import maps.bindings.Coordinates
+
 data class MapsState(val screen: MapsScreen = MapsScreen.Fun.ExpectFun())
 
 sealed interface MapsScreen {

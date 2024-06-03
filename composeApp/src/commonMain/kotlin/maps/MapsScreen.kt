@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import di.Inject
 import io.github.alexgladkov.kviewmodel.odyssey.StoredViewModel
+import maps.bindings.Coordinates
 import maps.bindings.GeoMapObject
 import maps.bindings.GeoMapObjectCollection
 import maps.bindings.GeoMapObjectDragListener

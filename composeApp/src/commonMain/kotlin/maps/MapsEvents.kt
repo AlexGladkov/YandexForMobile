@@ -1,5 +1,7 @@
 package maps
 
+import maps.bindings.Coordinates
+
 interface MapsEvent
 
 class AddPoint(val point: Coordinates): MapsEvent

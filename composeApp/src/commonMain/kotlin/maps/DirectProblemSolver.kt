@@ -1,5 +1,6 @@
 package maps
 
+import maps.bindings.Coordinates
 import maps.bindings.GeoPoint
 import maps.bindings.lat
 import maps.bindings.lon
