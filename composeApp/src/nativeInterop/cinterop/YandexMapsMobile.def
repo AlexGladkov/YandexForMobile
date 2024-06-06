@@ -1,0 +1,11 @@
+package = platform.YandexMapsMobile
+depends = Foundation UIKit
+language = Objective-C
+compilerOpts = "-D__COREFOUNDATION_CFCGTYPES__=1"
+modules = YandexMapsMobile
+excludeDependentModules = true
+
+---
+
+@protocol YRTPlatformView
+@end

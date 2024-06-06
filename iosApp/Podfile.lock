@@ -2,10 +2,16 @@ PODS:
   - Flutter (1.0.0)
   - FlutterPluginRegistrant (0.0.1):
     - Flutter
+  - YandexMapsMobile (4.6.1-lite)
 
 DEPENDENCIES:
   - Flutter (from `../yandexPro/.ios/Flutter`)
   - FlutterPluginRegistrant (from `../yandexPro/.ios/Flutter/FlutterPluginRegistrant`)
+  - YandexMapsMobile (= 4.6.1-lite)
+
+SPEC REPOS:
+  trunk:
+    - YandexMapsMobile
 
 EXTERNAL SOURCES:
   Flutter:
@@ -16,7 +22,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   FlutterPluginRegistrant: 0b732256b4829f9783c18c68e2f9adacc1536955
+  YandexMapsMobile: 7e20ef4db180b901c96f8107fade91d6349248a0
 
-PODFILE CHECKSUM: 91bd8948bb4bdc9254dcb5206b0aa39f5e63f902
+PODFILE CHECKSUM: f3ac8e1a00620f48ae8f754308b384fd4dea82f9
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.11.3

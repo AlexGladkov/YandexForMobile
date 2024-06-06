@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import browser.BrowserNavigation
+import maps.MapsNavigation
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.setSingletonImageLoaderFactory
 import core.getAsyncImageLoader
@@ -89,6 +90,7 @@ fun App() {
 
                         "pro" -> platformConfiguration.openFlutterModule(world.key)
                         "browser" -> rootController.present(BrowserNavigation.BROWSER_FLOW)
+                        "maps" -> rootController.present(MapsNavigation.FLOW)
                     }
                 }
             }
@@ -99,7 +101,8 @@ fun App() {
 @Composable
 private fun WorldItemView(title: String, logo: DrawableResource, onItemClicked: () -> Unit) {
     Card(
-        modifier = Modifier.clickable { onItemClicked.invoke() }.padding(8.dp).height(180.dp).fillMaxWidth(),
+        modifier = Modifier.clickable { onItemClicked.invoke() }.padding(8.dp).height(180.dp)
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = 8.dp
     ) {
@@ -150,6 +153,12 @@ private object Apps {
             name = "Браузер",
             logo = Res.drawable.yabro_logo,
             tech = ModuleTech.KMP,
+        ),
+        Module(
+            key = "maps",
+            name = "Maps",
+            logo = Res.drawable.future_app_logo,
+            tech = ModuleTech.KMP
         ),
         Module(
             key = "sample_app",

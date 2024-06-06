@@ -11,6 +11,7 @@ target 'iosApp' do
   load File.join(pro_flutter_module_path, '.ios', 'Flutter', 'podhelper.rb')
   install_all_flutter_pods(pro_flutter_module_path)
 
+  pod 'YandexMapsMobile', '4.6.1-lite'
 end
 
 post_install do |installer|
