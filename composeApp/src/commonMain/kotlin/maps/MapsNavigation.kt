@@ -7,7 +7,11 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 fun RootComposeBuilder.mapsFlow() {
     flow(name = MapsNavigation.FLOW) {
         screen(name = MapsNavigation.SCREEN) {
-            MapsScreen()
+            MapsPresentationScreen()
+        }
+
+        screen(name = MapsNavigation.HAVE_FUN_WITH_MAP) {
+            MapFunScreen()
         }
     }
 }
@@ -15,4 +19,5 @@ fun RootComposeBuilder.mapsFlow() {
 object MapsNavigation {
     const val FLOW = "MapsFlow"
     internal const val SCREEN = "MapsScreen"
+    internal const val HAVE_FUN_WITH_MAP = "HaveFunWithMap"
 }
