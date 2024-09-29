@@ -53,14 +53,13 @@ import maps.udf.AddPoint
 import maps.udf.BeginEditContourPart
 import maps.udf.EditableContour
 import maps.udf.EndEditContourPart
-import maps.udf.SwitchToDragMap
-import maps.udf.SwitchToDrawContour
 import maps.udf.GoToActualFun
 import maps.udf.GoToExpectFun
-import maps.udf.MapScreen
 import maps.udf.MapsEvent
 import maps.udf.RelativeContour
 import maps.udf.RevertLastContourPart
+import maps.udf.SwitchToDragMap
+import maps.udf.SwitchToDrawContour
 import maps.utils.DirectProblemSolver
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.vectorResource
@@ -69,12 +68,6 @@ import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import worlds.composeapp.generated.resources.Res
 import worlds.composeapp.generated.resources.map_control_button_drag
 import worlds.composeapp.generated.resources.map_control_button_draw
-
-
-@Composable
-fun MapsScreen() {
-    MapFunScreen()
-}
 
 @Composable
 expect fun MapsConfig.dotImage(): GeoPlacemarkImage
@@ -124,7 +117,7 @@ class MapScreenMutableState(
 private data class ImmutableConfig(val impl: MapsConfig)
 
 @Composable
-private fun MapFunScreen() {
+fun MapFunScreen() {
     val config by derivedStateOf {
         ImmutableConfig(Inject.di.instance<PlatformConfiguration>().mapsConfig())
     }
@@ -289,7 +282,7 @@ private fun CloseButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
+fun TouchInterceptorOverlay(onTouchEvent: (PointerEvent) -> Unit) = Box(
     modifier = Modifier.fillMaxWidth().fillMaxHeight()
         .pointerInput(Unit) {
             awaitPointerEventScope {
